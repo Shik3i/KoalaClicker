@@ -108,11 +108,11 @@
       return `[data-cy="${CSS.escape(el.getAttribute('data-cy'))}"]`;
     }
     
-    // Matches 5+ random alphanumeric chars (e.g., "css-1ab2c3"), ignores "mt-4"
+    // Checks if any segment of the class is an alphanumeric hash (e.g., "css-1ab2c3")
     const isDynamicId = (str) => {
-      if (!str) return true;
-      const isAlphanumericHash = /[a-zA-Z0-9]{5,}(?:[_-]|$)/.test(str) && /\d/.test(str) && /[a-zA-Z]/.test(str);
-      return isAlphanumericHash || str.length > 30;
+      if (!str || str.length > 30) return true;
+      const parts = str.split(/[_-]/);
+      return parts.some(part => part.length >= 5 && /\d/.test(part) && /[a-zA-Z]/.test(part));
     };
     if (el.id && !isDynamicId(el.id)) {
       return '#' + CSS.escape(el.id);
