@@ -1,34 +1,58 @@
-# KoalaClicker
+<div align="center">
+  <img src="src/assets/icon128.png" alt="KoalaClicker Logo" width="128" />
+  <h1>KoalaClicker</h1>
+  <p><strong>A modern, lightweight, privacy-focused auto-clicker browser extension.</strong></p>
 
-KoalaClicker is a modern, lightweight, privacy-focused auto-clicker browser extension designed for idle games and repetitive web tasks. Built purely with Vanilla HTML, CSS, and JavaScript, it requires zero external dependencies and respects your privacy by never injecting scripts without your explicit action.
+  <p>
+    <a href="https://github.com/Shik3i/KoalaClicker/releases/latest"><img src="https://img.shields.io/github/v/release/Shik3i/KoalaClicker?color=bd93f9&label=Latest%20Release&style=flat-square" alt="Latest Release"></a>
+    <a href="https://github.com/Shik3i/KoalaClicker/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Shik3i/KoalaClicker?color=50fa7b&style=flat-square" alt="License"></a>
+    <img src="https://img.shields.io/badge/Dependencies-0-ff79c6?style=flat-square" alt="Zero Dependencies">
+    <img src="https://img.shields.io/badge/Vanilla-JS%20%7C%20HTML%20%7C%20CSS-f1fa8c?style=flat-square" alt="Vanilla Stack">
+  </p>
+</div>
 
-## Features
+---
 
-- **Privacy First**: Operates exclusively via the `activeTab` permission. It only runs when you click the extension icon.
-- **Multiple Clickers**: Add and manage multiple clickable elements on a single page, each with its own customizable interval.
-- **Cross-Browser**: Supports Google Chrome, Mozilla Firefox, and other Chromium-based browsers.
-- **Zero Dependencies**: Pure Vanilla JS, ensuring the highest performance and the lowest footprint.
-- **State Resumption**: Even though it doesn't automatically track you across page reloads, opening the popup after a reload instantly lets you resume your previously saved clickers on that site.
+KoalaClicker is designed for idle games and repetitive web tasks. Built purely with Vanilla HTML, CSS, and JavaScript, it requires **zero external dependencies** and respects your privacy by never automatically injecting scripts without your explicit action.
 
-## Installation
+## ✨ Features
+
+- 🔒 **Privacy First**: Operates exclusively via the `activeTab` permission. It only runs when you click the extension icon.
+- 🎯 **Multiple Clickers**: Add and manage multiple clickable elements on a single page, each with its own customizable interval.
+- 🌐 **Cross-Browser**: Supports Google Chrome, Mozilla Firefox, and other Chromium-based browsers.
+- ⚡ **Zero Dependencies**: Pure Vanilla JS, ensuring the highest performance and the lowest footprint.
+- 💾 **State Resumption**: Even though it doesn't automatically track you across page reloads, opening the popup after a reload instantly lets you resume your previously saved clickers on that site!
+
+## 📦 Installation
 
 ### For Users
-1. Download the latest `.zip` release for your browser from the [Releases](https://github.com/Shik3i/KoalaClicker/releases) page.
-2. Unzip the file.
-3. **Chrome / Edge**: 
-   - Go to `chrome://extensions/` or `edge://extensions/`.
-   - Enable "Developer mode".
-   - Click "Load unpacked" and select the unzipped folder.
+
+1. Download the latest `.zip` release for your browser from the **[Latest Releases](https://github.com/Shik3i/KoalaClicker/releases/latest)** page.
+2. Unzip the downloaded file.
+3. **Chrome / Edge / Brave**: 
+   - Navigate to `chrome://extensions/` or `edge://extensions/`.
+   - Toggle on **"Developer mode"** in the top right.
+   - Click **"Load unpacked"** and select the unzipped folder.
 4. **Firefox**:
-   - Go to `about:debugging#/runtime/this-firefox`.
-   - Click "Load Temporary Add-on" and select the `manifest.json` file inside the unzipped folder.
+   - Navigate to `about:debugging#/runtime/this-firefox`.
+   - Click **"Load Temporary Add-on"** and select the `manifest.json` file inside the unzipped folder.
 
 ### For Developers
-1. Clone the repository: `git clone https://github.com/Shik3i/KoalaClicker.git`
+
+1. Clone the repository: 
+   ```bash
+   git clone https://github.com/Shik3i/KoalaClicker.git
+   ```
 2. Make your modifications inside the `src` directory.
 3. Load the `src` folder as an unpacked extension in your browser.
+4. *(Optional)* Read the [ARCHITECTURE.md](ARCHITECTURE.md) to understand the data flows.
 
-## Building for Release
+## 🚀 Building for Release
 
-The project uses GitHub Actions to automatically package the extension for Chrome and Firefox.
-Simply push a new tag (e.g., `v1.0.0`), and the `.github/workflows/release.yml` will automatically build and attach `koalaclicker-chrome.zip` and `koalaclicker-firefox.zip` to the new GitHub Release.
+This project uses **GitHub Actions** to automatically package the extension for Chrome and Firefox.
+Simply push a new tag, and the workflow will automatically build and attach `koalaclicker-chrome.zip` and `koalaclicker-firefox.zip` to the new GitHub Release.
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
