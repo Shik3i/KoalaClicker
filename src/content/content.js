@@ -19,16 +19,14 @@
   document.documentElement.appendChild(banner);
 
   // Inject MAIN world bypass script for anti-cheat engines (e.g., Cookie Clicker)
-  const bypassScript = document.createElement('script');
-  bypassScript.textContent = `
-    setInterval(() => {
-      if (typeof Game !== 'undefined' && typeof Game.lastClick !== 'undefined') {
-        Game.lastClick = 0;
-      }
-    }, 10);
-  `;
-  document.documentElement.appendChild(bypassScript);
-  bypassScript.remove(); // Clean up the DOM element, the interval keeps running in memory
+  try {
+    const bypassScript = document.createElement('script');
+    bypassScript.src = chrome.runtime.getURL('content/bypass.js');
+    (document.head || document.documentElement).appendChild(bypassScript);
+    bypassScript.onload = () => bypassScript.remove();
+  } catch (e) {
+    console.warn("KoalaClicker: Bypass script injection failed (likely CSP).", e);
+  }
 
   banner.querySelector('#koala-cancel-btn').addEventListener('click', () => {
     exitSelectionMode();

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "KoalaClicker",
-  "version": "1.0.0",
+  "version": "1.2.2",
   "description": "A modern, privacy-focused auto-clicker for idle games and web tasks.",
   "icons": {
     "16": "assets/icon16.png",
@@ -20,5 +20,15 @@
     "activeTab",
     "storage",
     "scripting"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content/bypass.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
   ]
 }
