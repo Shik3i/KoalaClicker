@@ -23,6 +23,9 @@ body {
   background-color: var(--panel-bg);
   padding: 12px 16px;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .header h1 {
@@ -30,6 +33,24 @@ body {
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--accent);
+}
+
+.header-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.75rem;
+  transition: color 0.2s ease;
+}
+
+.header-link:hover {
+  color: var(--accent-hover);
+}
+
+.header-link svg {
+  opacity: 0.8;
 }
 
 .actions {
@@ -185,28 +206,3 @@ button {
   background-color: var(--danger-hover);
 }
 
-.footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 16px;
-  background-color: var(--panel-bg);
-  border-top: 1px solid var(--border);
-  font-size: 0.75rem;
-}
-
-.github-link {
-  color: var(--accent);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.github-link:hover {
-  color: var(--accent-hover);
-  text-decoration: underline;
-}
-
-.version-label {
-  color: var(--text-muted);
-  opacity: 0.7;
-}

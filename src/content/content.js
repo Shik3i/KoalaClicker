@@ -18,6 +18,17 @@
   `;
   document.documentElement.appendChild(banner);
 
+  // Inject MAIN world bypass script for anti-cheat engines (e.g., Cookie Clicker)
+  const bypassScript = document.createElement('script');
+  bypassScript.textContent = `
+    setInterval(() => {
+      if (typeof Game !== 'undefined' && typeof Game.lastClick !== 'undefined') {
+        Game.lastClick = 0;
+      }
+    }, 10);
+  `;
+  document.documentElement.appendChild(bypassScript);
+
   banner.querySelector('#koala-cancel-btn').addEventListener('click', () => {
     exitSelectionMode();
   });
@@ -155,13 +166,17 @@
   function saveNewClicker(selector) {
     chrome.storage.local.get([currentSiteKey], (result) => {
       const clickers = result[currentSiteKey] || [];
+      if (clickers.length >= 50) {
+        alert("KoalaClicker: Maximum of 50 clickers per page reached.");
+        return;
+      }
       const clickerName = "Clicker " + (clickers.length + 1);
       
       clickers.push({
         selector: selector,
         name: clickerName,
         interval: 250, // Default interval
-        active: true,
+        active: false,
         id: Date.now().toString()
       });
       
