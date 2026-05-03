@@ -96,16 +96,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         nameInput.addEventListener('input', (e) => {
           clicker.name = e.target.value;
-          updateClicker(clickers);
+          updateClickersSilently(clickers);
         });
 
         intervalInput.addEventListener('input', (e) => {
           let val = parseInt(e.target.value, 10);
           if (isNaN(val) || val < 25) val = 25;
-          // We don't force e.target.value = val during 'input' because it breaks typing (e.g. typing "1" gets forced to "25" instantly).
-          // We only update the data model.
           clicker.interval = val;
-          updateClicker(clickers);
+          updateClickersSilently(clickers);
         });
 
         // Ensure the input field corrects itself visually when the user clicks away
@@ -147,6 +145,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     obj[siteKey] = clickers;
     chrome.storage.local.set(obj, () => {
       loadAndRenderClickers();
+    });
+  }
+
+  function updateClickersSilently(clickers) {
+    const obj = {};
+    obj[siteKey] = clickers;
+    chrome.storage.local.set(obj, () => {
+      chrome.tabs.sendMessage(tab.id, { action: 'SYNC_CLICKERS', clickers: clickers, url: siteKey });
     });
   }
 });

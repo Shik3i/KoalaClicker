@@ -35,6 +35,9 @@
       currentSiteKey = message.url;
       syncClickers(message.clickers);
     } else if (message.action === 'HIGHLIGHT_ELEMENT') {
+      if (currentlyHighlighted) {
+        currentlyHighlighted.classList.remove('koala-clicker-highlight');
+      }
       const el = document.querySelector(message.selector);
       if (el) {
         el.classList.add('koala-clicker-highlight');
