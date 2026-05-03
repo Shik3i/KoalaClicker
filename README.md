@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="src/assets/icon128.png" alt="KoalaClicker Logo" width="128" />
   <h1>KoalaClicker</h1>
   <p><strong>A modern, lightweight, privacy-focused auto-clicker browser extension.</strong></p>
 
