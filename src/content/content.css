@@ -1,0 +1,52 @@
+/* KoalaClicker injected styles */
+.koala-clicker-highlight {
+  outline: 3px solid #ff79c6 !important;
+  outline-offset: -3px !important;
+  box-shadow: 0 0 10px rgba(255, 121, 198, 0.8) !important;
+  cursor: crosshair !important;
+  transition: outline 0.1s ease, box-shadow 0.1s ease !important;
+}
+
+.koala-clicker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2147483646;
+  pointer-events: none;
+  background: rgba(40, 42, 54, 0.2);
+}
+
+.koala-clicker-banner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #282a36;
+  color: #f8f8f2;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #bd93f9;
+  z-index: 2147483647;
+  font-family: system-ui, sans-serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.koala-clicker-banner button {
+  background: #ff5555;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.koala-clicker-banner button:hover {
+  background: #ff6e6e;
+}
