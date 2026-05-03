@@ -23,6 +23,8 @@
   });
 
   // Listen for messages from popup
+  let currentlyHighlighted = null;
+
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'PING') {
       sendResponse({ status: 'OK' });
@@ -32,6 +34,17 @@
     } else if (message.action === 'SYNC_CLICKERS') {
       currentSiteKey = message.url;
       syncClickers(message.clickers);
+    } else if (message.action === 'HIGHLIGHT_ELEMENT') {
+      const el = document.querySelector(message.selector);
+      if (el) {
+        el.classList.add('koala-clicker-highlight');
+        currentlyHighlighted = el;
+      }
+    } else if (message.action === 'UNHIGHLIGHT_ELEMENT') {
+      if (currentlyHighlighted) {
+        currentlyHighlighted.classList.remove('koala-clicker-highlight');
+        currentlyHighlighted = null;
+      }
     }
   });
 
@@ -118,8 +131,11 @@
   function saveNewClicker(selector) {
     chrome.storage.local.get([currentSiteKey], (result) => {
       const clickers = result[currentSiteKey] || [];
+      const clickerName = "Clicker " + (clickers.length + 1);
+      
       clickers.push({
         selector: selector,
+        name: clickerName,
         interval: 250, // Default interval
         active: true,
         id: Date.now().toString()

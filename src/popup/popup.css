@@ -94,13 +94,28 @@ button {
   align-items: center;
 }
 
-.clicker-name {
+.clicker-name-input {
   font-size: 0.9rem;
   font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
+  color: var(--text-main);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  width: 130px;
   text-overflow: ellipsis;
-  max-width: 180px;
+  font-family: inherit;
+  transition: border 0.2s ease;
+}
+
+.clicker-name-input:hover {
+  border-color: var(--border);
+}
+
+.clicker-name-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background-color: var(--bg-color);
 }
 
 .status-badge {

@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         item.innerHTML = `
           <div class="clicker-header">
-            <span class="clicker-name" title="${clicker.selector}">Clicker ${index + 1}</span>
+            <input type="text" class="clicker-name-input" value="${clicker.name || 'Clicker ' + (index + 1)}" title="Selector: ${clicker.selector}" placeholder="Name this clicker" />
             <span class="status-badge ${clicker.active ? '' : 'stopped'}">${clicker.active ? 'Running' : 'Stopped'}</span>
           </div>
           <div class="clicker-controls">
@@ -89,16 +89,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
 
         // Event Listeners for controls
+        const nameInput = item.querySelector('.clicker-name-input');
         const intervalInput = item.querySelector('.interval-input');
         const stopBtn = item.querySelector('.btn-stop');
         const removeBtn = item.querySelector('.btn-remove');
 
+        nameInput.addEventListener('input', (e) => {
+          clicker.name = e.target.value;
+          updateClicker(clickers);
+        });
+
+        intervalInput.addEventListener('input', (e) => {
+          let val = parseInt(e.target.value, 10);
+          if (isNaN(val) || val < 25) val = 25;
+          // We don't force e.target.value = val during 'input' because it breaks typing (e.g. typing "1" gets forced to "25" instantly).
+          // We only update the data model.
+          clicker.interval = val;
+          updateClicker(clickers);
+        });
+
+        // Ensure the input field corrects itself visually when the user clicks away
         intervalInput.addEventListener('change', (e) => {
           let val = parseInt(e.target.value, 10);
           if (isNaN(val) || val < 25) val = 25;
           e.target.value = val;
-          clicker.interval = val;
-          updateClicker(clickers);
+        });
+
+        // Highlight element on hover
+        item.addEventListener('mouseenter', () => {
+          chrome.tabs.sendMessage(tab.id, { action: 'HIGHLIGHT_ELEMENT', selector: clicker.selector });
+        });
+        
+        item.addEventListener('mouseleave', () => {
+          chrome.tabs.sendMessage(tab.id, { action: 'UNHIGHLIGHT_ELEMENT' });
         });
 
         stopBtn.addEventListener('click', () => {
