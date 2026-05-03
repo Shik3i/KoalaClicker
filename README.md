@@ -4,7 +4,7 @@
 
   <p>
     <a href="https://github.com/Shik3i/KoalaClicker/releases/latest"><img src="https://img.shields.io/github/v/release/Shik3i/KoalaClicker?color=bd93f9&label=Latest%20Release&style=flat-square" alt="Latest Release"></a>
-    <a href="https://github.com/Shik3i/KoalaClicker/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Shik3i/KoalaClicker?color=50fa7b&style=flat-square" alt="License"></a>
+    <a href="https://github.com/Shik3i/KoalaClicker/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-50fa7b?style=flat-square" alt="License"></a>
     <img src="https://img.shields.io/badge/Dependencies-0-ff79c6?style=flat-square" alt="Zero Dependencies">
     <img src="https://img.shields.io/badge/Vanilla-JS%20%7C%20HTML%20%7C%20CSS-f1fa8c?style=flat-square" alt="Vanilla Stack">
   </p>
@@ -45,13 +45,3 @@ KoalaClicker is designed for idle games and repetitive web tasks. Built purely w
 2. Make your modifications inside the `src` directory.
 3. Load the `src` folder as an unpacked extension in your browser.
 4. *(Optional)* Read the [ARCHITECTURE.md](ARCHITECTURE.md) to understand the data flows.
-
-## 🚀 Building for Release
-
-This project uses **GitHub Actions** to automatically package the extension for Chrome and Firefox.
-Simply push a new tag, and the workflow will automatically build and attach `koalaclicker-chrome.zip` and `koalaclicker-firefox.zip` to the new GitHub Release.
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
