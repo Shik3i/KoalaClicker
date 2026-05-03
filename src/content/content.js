@@ -102,14 +102,26 @@
   }
 
   function generateSelector(el) {
-    if (el.id) {
+    // Check for stable data attributes first
+    if (el.hasAttribute('data-testid')) {
+      return `[data-testid="${CSS.escape(el.getAttribute('data-testid'))}"]`;
+    }
+    if (el.hasAttribute('data-cy')) {
+      return `[data-cy="${CSS.escape(el.getAttribute('data-cy'))}"]`;
+    }
+    
+    // Ignore dynamically generated looking IDs (contains numbers or is very long)
+    const isDynamicId = (id) => /\d/.test(id) || id.length > 20;
+    if (el.id && !isDynamicId(el.id)) {
       return '#' + CSS.escape(el.id);
     }
+
     let path = [];
     let current = el;
     while (current && current.nodeType === Node.ELEMENT_NODE) {
       let selector = current.nodeName.toLowerCase();
-      if (current.id) {
+      
+      if (current.id && !isDynamicId(current.id)) {
         selector += '#' + CSS.escape(current.id);
         path.unshift(selector);
         break;
@@ -178,27 +190,38 @@
     });
   }
 
+  const elementCache = {};
+
   function triggerClick(selector) {
     try {
-      const el = document.querySelector(selector);
-      if (el) {
+      let cached = elementCache[selector];
+      
+      // Refresh cache if element is missing or disconnected from DOM
+      if (!cached || !cached.el.isConnected) {
+        const el = document.querySelector(selector);
+        if (!el) return; // Element not found, gracefully skip
+        
         const rect = el.getBoundingClientRect();
-        const clientX = rect.left + (rect.width / 2);
-        const clientY = rect.top + (rect.height / 2);
-
-        const eventOptions = {
-          view: window,
-          bubbles: true,
-          cancelable: true,
-          clientX: clientX,
-          clientY: clientY
+        cached = {
+          el,
+          clientX: rect.left + (rect.width / 2),
+          clientY: rect.top + (rect.height / 2)
         };
-
-        // Simulate a complete real click sequence
-        el.dispatchEvent(new MouseEvent('mousedown', eventOptions));
-        el.dispatchEvent(new MouseEvent('mouseup', eventOptions));
-        el.dispatchEvent(new MouseEvent('click', eventOptions));
+        elementCache[selector] = cached;
       }
+
+      const eventOptions = {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        clientX: cached.clientX,
+        clientY: cached.clientY
+      };
+
+      // Simulate a complete real click sequence
+      cached.el.dispatchEvent(new MouseEvent('mousedown', eventOptions));
+      cached.el.dispatchEvent(new MouseEvent('mouseup', eventOptions));
+      cached.el.dispatchEvent(new MouseEvent('click', eventOptions));
     } catch(e) {
       // Selector might be invalid if DOM changed drastically
       console.error("KoalaClicker Error:", e);

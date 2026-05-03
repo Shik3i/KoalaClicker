@@ -34,8 +34,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // "Add New Clicker" button logic
   addBtn.addEventListener('click', async () => {
-    // Tell content script to enter selection mode
-    chrome.tabs.sendMessage(tab.id, { action: 'ENTER_SELECTION_MODE', url: siteKey });
+    try {
+      // Tell content script to enter selection mode
+      await chrome.tabs.sendMessage(tab.id, { action: 'ENTER_SELECTION_MODE', url: siteKey });
+    } catch (e) {
+      console.error("Failed to enter selection mode", e);
+    }
     window.close(); // Close popup so user can interact with the page
   });
 
@@ -75,35 +79,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         const item = document.createElement('div');
         item.className = 'clicker-item';
         
-        item.innerHTML = `
-          <div class="clicker-header">
-            <input type="text" class="clicker-name-input" value="${clicker.name || 'Clicker ' + (index + 1)}" title="Selector: ${clicker.selector}" placeholder="Name this clicker" />
-            <span class="status-badge ${clicker.active ? '' : 'stopped'}">${clicker.active ? 'Running' : 'Stopped'}</span>
-          </div>
-          <div class="clicker-controls">
-            <input type="number" class="interval-input" value="${clicker.interval}" min="25" step="25" />
-            <span class="interval-label">ms</span>
-            <button class="btn-icon btn-stop ${clicker.active ? '' : 'is-stopped'}">${clicker.active ? 'Stop' : 'Start'}</button>
-            <button class="btn-icon btn-remove">Del</button>
-          </div>
-        `;
+        const header = document.createElement('div');
+        header.className = 'clicker-header';
 
-        // Event Listeners for controls
-        const nameInput = item.querySelector('.clicker-name-input');
-        const intervalInput = item.querySelector('.interval-input');
-        const stopBtn = item.querySelector('.btn-stop');
-        const removeBtn = item.querySelector('.btn-remove');
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.className = 'clicker-name-input';
+        nameInput.value = clicker.name || 'Clicker ' + (index + 1);
+        nameInput.title = `Selector: ${clicker.selector}`;
+        nameInput.placeholder = 'Name this clicker';
+
+        const statusBadge = document.createElement('span');
+        statusBadge.className = `status-badge ${clicker.active ? '' : 'stopped'}`;
+        statusBadge.textContent = clicker.active ? 'Running' : 'Stopped';
+
+        header.appendChild(nameInput);
+        header.appendChild(statusBadge);
+
+        const controls = document.createElement('div');
+        controls.className = 'clicker-controls';
+
+        const intervalInput = document.createElement('input');
+        intervalInput.type = 'number';
+        intervalInput.className = 'interval-input';
+        intervalInput.value = clicker.interval;
+        intervalInput.min = '25';
+        intervalInput.step = '25';
+
+        const intervalLabel = document.createElement('span');
+        intervalLabel.className = 'interval-label';
+        intervalLabel.textContent = 'ms';
+
+        const stopBtn = document.createElement('button');
+        stopBtn.className = `btn-icon btn-stop ${clicker.active ? '' : 'is-stopped'}`;
+        stopBtn.textContent = clicker.active ? 'Stop' : 'Start';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'btn-icon btn-remove';
+        removeBtn.textContent = 'Del';
+
+        controls.appendChild(intervalInput);
+        controls.appendChild(intervalLabel);
+        controls.appendChild(stopBtn);
+        controls.appendChild(removeBtn);
+
+        item.appendChild(header);
+        item.appendChild(controls);
 
         nameInput.addEventListener('input', (e) => {
           clicker.name = e.target.value;
-          updateClickersSilently(clickers);
+          debouncedUpdateSilently(clickers);
         });
 
         intervalInput.addEventListener('input', (e) => {
           let val = parseInt(e.target.value, 10);
           if (isNaN(val) || val < 25) val = 25;
           clicker.interval = val;
-          updateClickersSilently(clickers);
+          debouncedUpdateSilently(clickers);
         });
 
         // Ensure the input field corrects itself visually when the user clicks away
@@ -155,4 +187,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       chrome.tabs.sendMessage(tab.id, { action: 'SYNC_CLICKERS', clickers: clickers, url: siteKey });
     });
   }
+
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  const debouncedUpdateSilently = debounce(updateClickersSilently, 300);
 });
