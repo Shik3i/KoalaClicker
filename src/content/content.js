@@ -38,10 +38,14 @@
       if (currentlyHighlighted) {
         currentlyHighlighted.classList.remove('koala-clicker-highlight');
       }
-      const el = document.querySelector(message.selector);
-      if (el) {
-        el.classList.add('koala-clicker-highlight');
-        currentlyHighlighted = el;
+      try {
+        const el = document.querySelector(message.selector);
+        if (el) {
+          el.classList.add('koala-clicker-highlight');
+          currentlyHighlighted = el;
+        }
+      } catch (e) {
+        console.warn("KoalaClicker: Invalid selector prevented highlight execution.", e);
       }
     } else if (message.action === 'UNHIGHLIGHT_ELEMENT') {
       if (currentlyHighlighted) {
@@ -126,10 +130,17 @@
         path.unshift(selector);
         break;
       } else {
+        if (current.className && typeof current.className === 'string') {
+          const classes = current.className.split(/\s+/).filter(c => c && !isDynamicId(c));
+          if (classes.length > 0) {
+            selector += '.' + classes.map(c => CSS.escape(c)).join('.');
+          }
+        }
+        
         let sibling = current;
         let nth = 1;
         while (sibling = sibling.previousElementSibling) {
-          if (sibling.nodeName.toLowerCase() == selector) {
+          if (sibling.nodeName.toLowerCase() == current.nodeName.toLowerCase()) {
             nth++;
           }
         }
@@ -175,6 +186,11 @@
       }
     }
 
+    // Purge the element cache entirely to prevent Detached DOM leaks.
+    for (const key in elementCache) {
+      delete elementCache[key];
+    }
+
     // Start or update timers for active clickers
     clickers.forEach(clicker => {
       if (clicker.active) {
@@ -183,9 +199,11 @@
           clearInterval(activeTimers[clicker.id]);
         }
         
+        const safeInterval = Math.max(25, parseInt(clicker.interval, 10) || 250);
+
         activeTimers[clicker.id] = setInterval(() => {
           triggerClick(clicker.selector);
-        }, clicker.interval);
+        }, safeInterval);
       }
     });
   }
@@ -198,6 +216,7 @@
       
       // Refresh cache if element is missing or disconnected from DOM
       if (!cached || !cached.el.isConnected) {
+        delete elementCache[selector]; // Prevent memory leak of detached nodes
         const el = document.querySelector(selector);
         if (!el) return; // Element not found, gracefully skip
         

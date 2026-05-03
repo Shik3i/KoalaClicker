@@ -131,6 +131,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           debouncedUpdateSilently(clickers);
         });
 
+        nameInput.addEventListener('change', (e) => {
+          clicker.name = e.target.value;
+          updateClickersSilently(clickers);
+        });
+
         intervalInput.addEventListener('input', (e) => {
           let val = parseInt(e.target.value, 10);
           if (isNaN(val) || val < 25) val = 25;
@@ -138,11 +143,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           debouncedUpdateSilently(clickers);
         });
 
-        // Ensure the input field corrects itself visually when the user clicks away
         intervalInput.addEventListener('change', (e) => {
           let val = parseInt(e.target.value, 10);
           if (isNaN(val) || val < 25) val = 25;
-          e.target.value = val;
+          clicker.interval = val;
+          e.target.value = val; // Ensure visual correction
+          updateClickersSilently(clickers);
         });
 
         // Highlight element on hover
