@@ -23,8 +23,6 @@
   });
 
   // Listen for messages from popup
-  let currentlyHighlighted = null;
-
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'PING') {
       sendResponse({ status: 'OK' });
@@ -35,23 +33,19 @@
       currentSiteKey = message.url;
       syncClickers(message.clickers);
     } else if (message.action === 'HIGHLIGHT_ELEMENT') {
-      if (currentlyHighlighted) {
-        currentlyHighlighted.classList.remove('koala-clicker-highlight');
-      }
+      document.querySelectorAll('.koala-clicker-highlight').forEach(el => 
+        el.classList.remove('koala-clicker-highlight')
+      );
       try {
         const el = document.querySelector(message.selector);
-        if (el) {
-          el.classList.add('koala-clicker-highlight');
-          currentlyHighlighted = el;
-        }
+        if (el) el.classList.add('koala-clicker-highlight');
       } catch (e) {
         console.warn("KoalaClicker: Invalid selector prevented highlight execution.", e);
       }
     } else if (message.action === 'UNHIGHLIGHT_ELEMENT') {
-      if (currentlyHighlighted) {
-        currentlyHighlighted.classList.remove('koala-clicker-highlight');
-        currentlyHighlighted = null;
-      }
+      document.querySelectorAll('.koala-clicker-highlight').forEach(el => 
+        el.classList.remove('koala-clicker-highlight')
+      );
     }
   });
 
@@ -114,8 +108,12 @@
       return `[data-cy="${CSS.escape(el.getAttribute('data-cy'))}"]`;
     }
     
-    // Ignore dynamically generated looking IDs (contains numbers or is very long)
-    const isDynamicId = (id) => /\d/.test(id) || id.length > 20;
+    // Matches 5+ random alphanumeric chars (e.g., "css-1ab2c3"), ignores "mt-4"
+    const isDynamicId = (str) => {
+      if (!str) return true;
+      const isAlphanumericHash = /[a-zA-Z0-9]{5,}(?:[_-]|$)/.test(str) && /\d/.test(str) && /[a-zA-Z]/.test(str);
+      return isAlphanumericHash || str.length > 30;
+    };
     if (el.id && !isDynamicId(el.id)) {
       return '#' + CSS.escape(el.id);
     }
@@ -176,34 +174,31 @@
   }
 
   function syncClickers(clickers) {
-    // Stop all running timers that are not in the new active list
     const newActiveIds = clickers.filter(c => c.active).map(c => c.id);
     
+    // Stop deleted or deactivated clickers
     for (const id in activeTimers) {
       if (!newActiveIds.includes(id)) {
-        clearInterval(activeTimers[id]);
+        clearInterval(activeTimers[id].timer || activeTimers[id]);
         delete activeTimers[id];
       }
     }
 
-    // Purge the element cache entirely to prevent Detached DOM leaks.
-    for (const key in elementCache) {
-      delete elementCache[key];
-    }
-
-    // Start or update timers for active clickers
+    // Start or update active clickers safely
     clickers.forEach(clicker => {
       if (clicker.active) {
-        // Clear and restart it to ensure new interval is applied
-        if (activeTimers[clicker.id]) {
-          clearInterval(activeTimers[clicker.id]);
-        }
-        
         const safeInterval = Math.max(25, parseInt(clicker.interval, 10) || 250);
-
-        activeTimers[clicker.id] = setInterval(() => {
-          triggerClick(clicker.selector);
-        }, safeInterval);
+        const existing = activeTimers[clicker.id];
+        
+        // ONLY restart if the timer doesn't exist, or the timing value changed
+        if (!existing || existing.interval !== safeInterval) {
+          if (existing) clearInterval(existing.timer || existing);
+          
+          activeTimers[clicker.id] = {
+            interval: safeInterval,
+            timer: setInterval(() => triggerClick(clicker.selector), safeInterval)
+          };
+        }
       }
     });
   }
