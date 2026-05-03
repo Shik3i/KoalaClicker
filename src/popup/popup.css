@@ -169,3 +169,29 @@ button {
 .btn-remove:hover {
   background-color: var(--danger-hover);
 }
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: var(--panel-bg);
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+}
+
+.github-link {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.github-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.version-label {
+  color: var(--text-muted);
+  opacity: 0.7;
+}

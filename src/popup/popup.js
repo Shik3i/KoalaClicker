@@ -19,6 +19,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const urlObj = new URL(tab.url);
   const siteKey = urlObj.origin + urlObj.pathname;
 
+  // Set version label
+  const versionLabel = document.getElementById('version-label');
+  const manifest = chrome.runtime.getManifest();
+  if (versionLabel && manifest) {
+    versionLabel.textContent = `v${manifest.version}`;
+  }
+
   // Inject content script if not already injected
   await injectContentScriptIfNeeded(tab.id);
 

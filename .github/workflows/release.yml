@@ -12,6 +12,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Sync Manifest Version
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          jq --arg v "$VERSION" '.version = $v' src/manifest.json > src/manifest.json.tmp
+          mv src/manifest.json.tmp src/manifest.json
+
       - name: Build Chrome Extension
         run: |
           mkdir -p build/chrome
