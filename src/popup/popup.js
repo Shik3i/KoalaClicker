@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <span class="status-badge ${clicker.active ? '' : 'stopped'}">${clicker.active ? 'Running' : 'Stopped'}</span>
           </div>
           <div class="clicker-controls">
-            <input type="number" class="interval-input" value="${clicker.interval}" min="100" />
+            <input type="number" class="interval-input" value="${clicker.interval}" min="100" step="25" />
             <span class="interval-label">ms</span>
             <button class="btn-icon btn-stop ${clicker.active ? '' : 'is-stopped'}">${clicker.active ? 'Stop' : 'Start'}</button>
             <button class="btn-icon btn-remove">Del</button>

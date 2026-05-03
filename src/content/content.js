@@ -163,13 +163,22 @@
     try {
       const el = document.querySelector(selector);
       if (el) {
-        // Simulate real click
-        const event = new MouseEvent('click', {
+        const rect = el.getBoundingClientRect();
+        const clientX = rect.left + (rect.width / 2);
+        const clientY = rect.top + (rect.height / 2);
+
+        const eventOptions = {
           view: window,
           bubbles: true,
-          cancelable: true
-        });
-        el.dispatchEvent(event);
+          cancelable: true,
+          clientX: clientX,
+          clientY: clientY
+        };
+
+        // Simulate a complete real click sequence
+        el.dispatchEvent(new MouseEvent('mousedown', eventOptions));
+        el.dispatchEvent(new MouseEvent('mouseup', eventOptions));
+        el.dispatchEvent(new MouseEvent('click', eventOptions));
       }
     } catch(e) {
       // Selector might be invalid if DOM changed drastically
