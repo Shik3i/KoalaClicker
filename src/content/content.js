@@ -28,6 +28,7 @@
     }, 10);
   `;
   document.documentElement.appendChild(bypassScript);
+  bypassScript.remove(); // Clean up the DOM element, the interval keeps running in memory
 
   banner.querySelector('#koala-cancel-btn').addEventListener('click', () => {
     exitSelectionMode();
