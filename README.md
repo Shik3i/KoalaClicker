@@ -7,14 +7,12 @@
     <a href="https://github.com/Shik3i/KoalaClicker/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-50fa7b?style=flat-square" alt="License"></a>
     <img src="https://img.shields.io/badge/Dependencies-0-ff79c6?style=flat-square" alt="Zero Dependencies">
     <img src="https://img.shields.io/badge/Vanilla-JS%20%7C%20HTML%20%7C%20CSS-f1fa8c?style=flat-square" alt="Vanilla Stack">
-    <img src="https://img.shields.io/badge/Tracking-Zero-8be9fd?style=flat-square" alt="Zero Tracking">
-    <img src="https://img.shields.io/badge/Ads-Free-50fa7b?style=flat-square" alt="Ad-Free">
   </p>
 </div>
 
 ---
 
-KoalaClicker is designed for idle games and repetitive web tasks. Built purely with Vanilla HTML, CSS, and JavaScript, it requires **zero external dependencies** and respects your privacy by never automatically injecting scripts without your explicit action.
+KoalaClicker is designed for idle games and repetitive web tasks. Built purely with Vanilla HTML, CSS, and JavaScript, it requires **zero external dependencies**, contains **absolutely no tracking or telemetry**, is **100% ad-free**, and respects your privacy by never automatically injecting scripts without your explicit action.
 
 ## ✨ Features
 
