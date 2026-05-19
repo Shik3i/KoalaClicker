@@ -18,15 +18,7 @@
   `;
   document.documentElement.appendChild(banner);
 
-  // Inject MAIN world bypass script for anti-cheat engines (e.g., Cookie Clicker)
-  try {
-    const bypassScript = document.createElement('script');
-    bypassScript.src = chrome.runtime.getURL('content/bypass.js');
-    (document.head || document.documentElement).appendChild(bypassScript);
-    bypassScript.onload = () => bypassScript.remove();
-  } catch (e) {
-    console.warn("KoalaClicker: Bypass script injection failed (likely CSP).", e);
-  }
+  // Note: MAIN-world bypass script is now injected natively by popup.js to resist CSP blocks.
 
   banner.querySelector('#koala-cancel-btn').addEventListener('click', () => {
     exitSelectionMode();
@@ -162,6 +154,27 @@
     return path.join(' > ');
   }
 
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'koala-clicker-toast';
+    toast.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#bd93f9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span>${message}</span>
+    `;
+    document.documentElement.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Remove toast after duration
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 2500);
+  }
+
   function saveNewClicker(selector) {
     chrome.storage.local.get([currentSiteKey], (result) => {
       const clickers = result[currentSiteKey] || [];
@@ -183,6 +196,7 @@
       obj[currentSiteKey] = clickers;
       chrome.storage.local.set(obj, () => {
         syncClickers(clickers);
+        showToast(`${clickerName} successfully added!`);
       });
     });
   }
@@ -229,21 +243,21 @@
         const el = document.querySelector(selector);
         if (!el) return; // Element not found, gracefully skip
         
-        const rect = el.getBoundingClientRect();
-        cached = {
-          el,
-          clientX: rect.left + (rect.width / 2),
-          clientY: rect.top + (rect.height / 2)
-        };
+        cached = { el };
         elementCache[selector] = cached;
       }
+
+      // Compute element coordinates dynamically on every tick to support moving elements
+      const rect = cached.el.getBoundingClientRect();
+      const clientX = rect.left + (rect.width / 2);
+      const clientY = rect.top + (rect.height / 2);
 
       const eventOptions = {
         view: window,
         bubbles: true,
         cancelable: true,
-        clientX: cached.clientX,
-        clientY: cached.clientY
+        clientX: clientX,
+        clientY: clientY
       };
 
       // Simulate a complete real click sequence

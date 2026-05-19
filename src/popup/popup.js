@@ -8,11 +8,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (tabs.length === 0) return;
   const tab = tabs[0];
 
-  if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('about:') || tab.url.startsWith('edge://')) {
+  const blockedProtocols = ['chrome:', 'about:', 'edge:', 'chrome-extension:', 'view-source:'];
+  const isBlocked = !tab.url || blockedProtocols.some(proto => tab.url.startsWith(proto));
+  if (isBlocked) {
     addBtn.disabled = true;
     addBtn.style.opacity = '0.5';
     addBtn.style.cursor = 'not-allowed';
     emptyState.textContent = "Cannot run on this page.";
+    emptyState.style.display = 'block';
     return;
   }
 
@@ -27,7 +30,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Inject content script if not already injected
-  await injectContentScriptIfNeeded(tab.id);
+  try {
+    await injectContentScriptIfNeeded(tab.id);
+  } catch (e) {
+    console.error("Failed to inject content script", e);
+    addBtn.disabled = true;
+    addBtn.style.opacity = '0.5';
+    addBtn.style.cursor = 'not-allowed';
+    emptyState.textContent = "Script injection is blocked on this page (e.g. Chrome Web Store or local file without permission).";
+    emptyState.style.display = 'block';
+    return;
+  }
 
   // Load saved clickers
   await loadAndRenderClickers();
@@ -48,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Check if it responds
       await chrome.tabs.sendMessage(tabId, { action: 'PING' });
     } catch (e) {
-      // Need to inject
+      // Need to inject isolated content script and CSS
       await chrome.scripting.insertCSS({
         target: { tabId: tabId },
         files: ['content/content.css']
@@ -57,6 +70,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         target: { tabId: tabId },
         files: ['content/content.js']
       });
+      // Inject native MAIN-world bypass script (CSP immune)
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: tabId },
+          world: 'MAIN',
+          files: ['content/bypass.js']
+        });
+      } catch (bypassError) {
+        console.warn("KoalaClicker: Failed to inject main-world bypass script.", bypassError);
+      }
       // Give it a tiny moment to initialize
       await new Promise(r => setTimeout(r, 50));
     }
@@ -162,7 +185,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         stopBtn.addEventListener('click', () => {
           clicker.active = !clicker.active;
-          updateClicker(clickers);
+          
+          // Update visual state in place without full DOM rebuild
+          statusBadge.className = `status-badge ${clicker.active ? '' : 'stopped'}`;
+          statusBadge.textContent = clicker.active ? 'Running' : 'Stopped';
+          stopBtn.className = `btn-icon btn-stop ${clicker.active ? '' : 'is-stopped'}`;
+          stopBtn.textContent = clicker.active ? 'Stop' : 'Start';
+          
+          updateClickersSilently(clickers);
         });
 
         removeBtn.addEventListener('click', () => {
@@ -174,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       // Send the current list to the content script so it syncs its running intervals
-      chrome.tabs.sendMessage(tab.id, { action: 'SYNC_CLICKERS', clickers: clickers, url: siteKey });
+      chrome.tabs.sendMessage(tab.id, { action: 'SYNC_CLICKERS', clickers: clickers, url: siteKey }).catch(() => {});
     });
   }
 
@@ -190,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const obj = {};
     obj[siteKey] = clickers;
     chrome.storage.local.set(obj, () => {
-      chrome.tabs.sendMessage(tab.id, { action: 'SYNC_CLICKERS', clickers: clickers, url: siteKey });
+      chrome.tabs.sendMessage(tab.id, { action: 'SYNC_CLICKERS', clickers: clickers, url: siteKey }).catch(() => {});
     });
   }
 
