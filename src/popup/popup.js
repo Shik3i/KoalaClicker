@@ -3,6 +3,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listContainer = document.getElementById('clickers-list');
   const emptyState = document.getElementById('empty-state');
 
+  // Set version label immediately — before any early returns so it's always visible
+  const versionLabel = document.getElementById('version-label');
+  const manifest = chrome.runtime.getManifest();
+  if (versionLabel && manifest) {
+    versionLabel.textContent = `v${manifest.version}`;
+  }
+
   // Get current active tab
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
   if (tabs.length === 0) return;
@@ -21,13 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const urlObj = new URL(tab.url);
   const siteKey = urlObj.origin + urlObj.pathname;
-
-  // Set version label from live manifest (always accurate, never stale)
-  const versionLabel = document.getElementById('version-label');
-  const manifest = chrome.runtime.getManifest();
-  if (versionLabel && manifest) {
-    versionLabel.textContent = `v${manifest.version}`;
-  }
 
   // Inject content script if not already injected
   try {

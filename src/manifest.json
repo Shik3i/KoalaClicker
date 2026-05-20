@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "KoalaClicker",
   "version": "1.2.7",
-  "description": "A modern, privacy-focused auto-clicker for idle games and web tasks.",
+  "description": "Privacy-first auto-clicker for idle games & web tasks. Zero tracking, zero dependencies. Uses activeTab only — your data never leaves your device.",
   "icons": {
     "16": "assets/Logo_Cut_16.png",
     "48": "assets/Logo_Cut_48.png",

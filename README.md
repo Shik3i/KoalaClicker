@@ -1,47 +1,117 @@
 <div align="center">
-  <h1><img src="src/assets/Logo_Cut_128.png" width="38" height="38" valign="middle"> KoalaClicker</h1>
-  <p><strong>A modern, lightweight, privacy-focused auto-clicker browser extension.</strong></p>
+  <img src="src/assets/Logo_Cut_128.png" width="96" height="96" alt="KoalaClicker Logo">
+  <h1>KoalaClicker</h1>
+  <p><strong>A modern, privacy-first auto-clicker for idle games and repetitive web tasks.</strong></p>
 
   <p>
     <a href="https://github.com/Shik3i/KoalaClicker/releases/latest"><img src="https://img.shields.io/github/v/release/Shik3i/KoalaClicker?color=bd93f9&label=Latest%20Release&style=flat-square" alt="Latest Release"></a>
-    <a href="https://github.com/Shik3i/KoalaClicker/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-50fa7b?style=flat-square" alt="License"></a>
+    <a href="https://github.com/Shik3i/KoalaClicker/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-50fa7b?style=flat-square" alt="License: MIT"></a>
+    <img src="https://img.shields.io/badge/Manifest-V3-bd93f9?style=flat-square" alt="Manifest V3">
     <img src="https://img.shields.io/badge/Dependencies-0-ff79c6?style=flat-square" alt="Zero Dependencies">
-    <img src="https://img.shields.io/badge/Vanilla-JS%20%7C%20HTML%20%7C%20CSS-f1fa8c?style=flat-square" alt="Vanilla Stack">
+    <img src="https://img.shields.io/badge/Tracking-None-50fa7b?style=flat-square" alt="No Tracking">
+  </p>
+
+  <p>
+    <a href="https://github.com/Shik3i/KoalaClicker/releases/latest">
+      <img src="https://img.shields.io/badge/⬇%20Download%20for%20Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Download for Chrome">
+    </a>
+    &nbsp;
+    <a href="https://github.com/Shik3i/KoalaClicker/releases/latest">
+      <img src="https://img.shields.io/badge/⬇%20Download%20for%20Firefox-FF7139?style=for-the-badge&logo=firefox&logoColor=white" alt="Download for Firefox">
+    </a>
   </p>
 </div>
 
 ---
 
-KoalaClicker is designed for idle games and repetitive web tasks. Built purely with Vanilla HTML, CSS, and JavaScript, it requires **zero external dependencies**, contains **absolutely no tracking or telemetry**, is **100% ad-free**, and respects your privacy by never automatically injecting scripts without your explicit action.
+KoalaClicker lets you automate clicks on any element on any webpage — ideal for idle games like Cookie Clicker, farming simulators, or any repetitive web task. It is built entirely with **Vanilla HTML, CSS, and JavaScript**, has **zero external dependencies**, **no tracking whatsoever**, and is **100% ad-free**.
+
+Unlike most auto-clickers on the market, KoalaClicker uses the **`activeTab` permission model** — it has **zero access** to any page until *you* explicitly click the extension icon. Your CSS selectors and settings are stored 100% locally on your device via `chrome.storage.local` and never transmitted anywhere.
+
+---
 
 ## ✨ Features
 
-- 🔒 **Privacy First**: Operates exclusively via the `activeTab` permission. It only runs when you click the extension icon. **Absolutely zero tracking, no telemetry, and 100% ad-free.**
-- 🎯 **Multiple Clickers**: Add and manage multiple clickable elements on a single page, each with its own customizable interval.
-- 🌐 **Cross-Browser**: Supports Google Chrome, Mozilla Firefox, and other Chromium-based browsers.
-- ⚡ **Zero Dependencies**: Pure Vanilla JS, ensuring the highest performance and the lowest footprint.
-- 💾 **State Resumption**: Even though it doesn't automatically track you across page reloads, opening the popup after a reload instantly lets you resume your previously saved clickers on that site!
+| Feature | Details |
+|---|---|
+| 🔒 **Privacy First** | Uses `activeTab` only. No access to any tab until you click the icon. Zero tracking, zero telemetry, 100% ad-free. |
+| 🎯 **Multiple Clickers** | Add up to **50 parallel clickers** per website, each with its own interval and label. |
+| ⚡ **Ultra-Fast Clicking** | Minimum interval of **25ms** (40 clicks/sec). Handles multiple elements simultaneously. |
+| 🎮 **Game Engine Bypass** | Automatically bypasses anti-cheat cooldown variables (e.g. `Game.lastClick` in Cookie Clicker). |
+| ✏️ **Inline Editing** | Rename clickers, adjust intervals, start/stop individually — all live in the popup. |
+| 👁 **Live Highlighting** | Hover over a clicker card in the popup and the corresponding element is highlighted on the page in real time. |
+| 💾 **State Resumption** | Clickers are saved per-site. Reopen the popup after a page reload to resume instantly. |
+| 🌐 **Cross-Browser** | Works on Chrome, Firefox, Edge, Brave, and any Chromium-based browser. |
+| 🪶 **Lightweight** | Pure Vanilla JS — no frameworks, no build tools, no bloat. |
+
+---
 
 ## 📦 Installation
 
-### For Users
+### Option A — Chrome Web Store *(coming soon)*
 
-1. Download the latest `.zip` release for your browser from the **[Latest Releases](https://github.com/Shik3i/KoalaClicker/releases/latest)** page.
+> The extension will be available directly on the Chrome Web Store. Click Install — no unzipping required.
+
+### Option B — Manual Install (Releases)
+
+1. Go to the **[Latest Releases](https://github.com/Shik3i/KoalaClicker/releases/latest)** page and download the `.zip` for your browser.
 2. Unzip the downloaded file.
-3. **Chrome / Edge / Brave**: 
-   - Navigate to `chrome://extensions/` or `edge://extensions/`.
-   - Toggle on **"Developer mode"** in the top right.
-   - Click **"Load unpacked"** and select the unzipped folder.
-4. **Firefox**:
-   - Navigate to `about:debugging#/runtime/this-firefox`.
-   - Click **"Load Temporary Add-on"** and select the `manifest.json` file inside the unzipped folder.
 
-### For Developers
+**Chrome / Edge / Brave:**
+- Open `chrome://extensions/`
+- Enable **Developer mode** (top right toggle)
+- Click **Load unpacked** → select the unzipped folder
 
-1. Clone the repository: 
-   ```bash
-   git clone https://github.com/Shik3i/KoalaClicker.git
-   ```
-2. Make your modifications inside the `src` directory.
-3. Load the `src` folder as an unpacked extension in your browser.
-4. *(Optional)* Read the [ARCHITECTURE.md](ARCHITECTURE.md) to understand the data flows.
+**Firefox:**
+- Open `about:debugging#/runtime/this-firefox`
+- Click **Load Temporary Add-on** → select the `manifest.json` inside the unzipped folder
+
+---
+
+## 🚀 Quick Start
+
+1. **Navigate** to any webpage (e.g. an idle game).
+2. **Click** the KoalaClicker icon in your browser toolbar.
+3. Press **"Add New Clicker"** — the popup closes and Element Selection Mode activates.
+4. **Hover** over any element on the page — it will glow pink to confirm your target.
+5. **Click** the element to register it. The clicker starts immediately!
+6. Reopen the popup anytime to rename, adjust the speed, pause, or delete clickers.
+
+> 💡 **Pro Tip:** After a page reload, just click the extension icon again — all your clickers reload and resume automatically.
+
+---
+
+## 🔒 Privacy & Security
+
+KoalaClicker is designed to be the most privacy-respecting auto-clicker available:
+
+- **`activeTab` only**: The extension gains page access *only* when you explicitly click its icon. It cannot read your browsing history, access other tabs, or run in the background.
+- **No network requests**: KoalaClicker makes zero outbound network calls. Ever.
+- **Local storage only**: Your configurations (selectors, intervals, names) are stored exclusively in `chrome.storage.local` on your device.
+- **No eval()**: No dynamic code execution from external sources.
+- **Open Source**: The entire codebase is here for you to audit.
+
+Read the full [Privacy Policy](PRIVACY.md).
+
+---
+
+## 🛠 For Developers
+
+```bash
+git clone https://github.com/Shik3i/KoalaClicker.git
+cd KoalaClicker
+# Load the /src folder as an unpacked extension in chrome://extensions/
+```
+
+- All extension code lives in [`src/`](src/)
+- Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for a full breakdown of the data flows and component design
+- Read [`USAGE.md`](USAGE.md) for the full user guide and FAQ
+- The GitHub Actions workflow in [`.github/workflows/release.yml`](.github/workflows/release.yml) automatically injects the tag version into `manifest.json` and builds both Chrome and Firefox ZIPs on every `v*.*.*` tag push
+
+**Stack:** Vanilla JS · Vanilla CSS · HTML5 · Manifest V3 · Zero npm
+
+---
+
+## 📄 License
+
+Released under the [MIT License](LICENSE). © 2026 Shik3i
