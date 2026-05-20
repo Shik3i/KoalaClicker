@@ -27,7 +27,7 @@
         "content/bypass.js"
       ],
       "matches": [
-        "<all_urls>"
+        "*://*/*"
       ]
     }
   ]

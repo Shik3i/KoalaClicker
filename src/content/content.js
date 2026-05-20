@@ -28,6 +28,7 @@
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'PING') {
       sendResponse({ status: 'OK' });
+      return true; // Keep message channel open for async safety
     } else if (message.action === 'ENTER_SELECTION_MODE') {
       currentSiteKey = message.url;
       enterSelectionMode();
@@ -49,6 +50,7 @@
         el.classList.remove('koala-clicker-highlight')
       );
     }
+    return false;
   });
 
   function enterSelectionMode() {

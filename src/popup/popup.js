@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const urlObj = new URL(tab.url);
   const siteKey = urlObj.origin + urlObj.pathname;
 
-  // Set version label
+  // Set version label from live manifest (always accurate, never stale)
   const versionLabel = document.getElementById('version-label');
   const manifest = chrome.runtime.getManifest();
   if (versionLabel && manifest) {
@@ -196,8 +196,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         removeBtn.addEventListener('click', () => {
-          clickers.splice(index, 1);
-          updateClicker(clickers);
+          // Find the current index by id at deletion time to avoid stale-index bug
+          const currentClickers = clickers;
+          const idx = currentClickers.findIndex(c => c.id === clicker.id);
+          if (idx !== -1) {
+            currentClickers.splice(idx, 1);
+            updateClicker(currentClickers);
+          }
         });
 
         listContainer.appendChild(item);
