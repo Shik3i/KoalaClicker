@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — KoalaClicker</title>
+  <meta name="description" content="KoalaClicker collects no personal data whatsoever. Fully local, zero tracking, zero telemetry.">
+  <style>
+    :root {
+      --bg: #1e1e2e;
+      --panel: #282a36;
+      --text: #f8f8f2;
+      --muted: #6272a4;
+      --accent: #bd93f9;
+      --green: #50fa7b;
+      --border: #44475a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+
+    header .inner {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    header img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    header a {
+      margin-left: auto;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    header a:hover { color: var(--accent); }
+
+    main {
+      max-width: 760px;
+      margin: 48px auto;
+      padding: 0 24px 80px;
+    }
+
+    .hero {
+      background-color: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--green);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .hero-icon { font-size: 2rem; flex-shrink: 0; }
+
+    .hero p {
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .hero strong { color: var(--green); }
+
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 36px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    p { margin-bottom: 14px; color: var(--text); }
+
+    code {
+      background-color: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.88em;
+      color: var(--accent);
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    ul li {
+      padding-left: 24px;
+      position: relative;
+      color: var(--text);
+    }
+
+    ul li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .effective {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <img src="https://raw.githubusercontent.com/Shik3i/KoalaClicker/main/src/assets/Logo_Cut_128.png" alt="KoalaClicker Logo">
+    <h1>KoalaClicker</h1>
+    <a href="https://github.com/Shik3i/KoalaClicker">← Back to GitHub</a>
+  </div>
+</header>
+
+<main>
+  <h1 style="font-size:1.8rem; font-weight:700; color:var(--text); margin-bottom:8px;">Privacy Policy</h1>
+  <p class="effective">Effective Date: May 3, 2026</p>
+
+  <div class="hero">
+    <div class="hero-icon">🔒</div>
+    <p>
+      <strong>Short version: KoalaClicker collects absolutely nothing.</strong><br>
+      No personal data, no analytics, no telemetry, no external requests of any kind.
+      Everything runs 100% locally on your device.
+    </p>
+  </div>
+
+  <p>KoalaClicker ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains our practices regarding the collection, use, and disclosure of information when you use the KoalaClicker browser extension.</p>
+
+  <h2>1. Data Collection</h2>
+  <p><strong>We do not collect, store, or transmit any personal data.</strong> KoalaClicker operates entirely locally on your device. It does not use external servers, analytics tools, tracking pixels, or telemetry mechanisms of any kind.</p>
+  <p>The only data ever written to disk is your own configuration (CSS selectors, click intervals, and clicker names), which is stored exclusively in your browser's <code>chrome.storage.local</code> sandbox. This data:</p>
+  <ul>
+    <li>Never leaves your device</li>
+    <li>Is never transmitted over the network</li>
+    <li>Is never accessible to us or any third party</li>
+    <li>Can be deleted at any time by removing the extension</li>
+  </ul>
+
+  <h2>2. Permissions Explained</h2>
+  <p>KoalaClicker requires the following browser permissions to function, and nothing more:</p>
+  <ul>
+    <li><code>activeTab</code> — Grants access to the current tab <em>only when you explicitly click the extension icon</em>. It does not allow background access, browsing history access, or cross-tab tracking.</li>
+    <li><code>storage</code> — Used exclusively to save your configured clickers locally on your device so they persist between browser sessions. No data is synchronized to any cloud.</li>
+    <li><code>scripting</code> — Used to inject the click-automation logic into the active tab you have chosen to interact with. No scripts are injected automatically or in the background.</li>
+  </ul>
+
+  <h2>3. Third-Party Services</h2>
+  <p>KoalaClicker does not integrate with any third-party services, APIs, advertising networks, or analytics platforms. It is built entirely with zero external dependencies — no CDN resources, no remote fonts, no external images are loaded at runtime.</p>
+
+  <h2>4. Children's Privacy</h2>
+  <p>KoalaClicker does not knowingly collect any data from anyone, including children under the age of 13. Since we collect no data at all, COPPA compliance is inherent to our design.</p>
+
+  <h2>5. Changes to This Policy</h2>
+  <p>If we update this Privacy Policy, we will update the "Effective Date" at the top of this document. Since we do not collect contact information, we encourage you to review this policy periodically via the <a href="https://github.com/Shik3i/KoalaClicker/blob/main/PRIVACY.md">GitHub repository</a>.</p>
+
+  <h2>6. Contact</h2>
+  <p>If you have any questions about this Privacy Policy, please open an issue on our <a href="https://github.com/Shik3i/KoalaClicker/issues">GitHub Repository</a>.</p>
+</main>
+
+<footer>
+  © 2026 KoalaClicker · <a href="https://github.com/Shik3i/KoalaClicker">GitHub</a> · <a href="https://github.com/Shik3i/KoalaClicker/blob/main/LICENSE">MIT License</a>
+</footer>
+
+</body>
+</html>
