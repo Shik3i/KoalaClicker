@@ -25,8 +25,8 @@
         <span class="nav-brand-text">KoalaClicker</span>
       </a>
       <ul class="nav-links" id="nav-links" role="list">
-        <li><a href="index.html#features" class="nav-link">Features</a></li>
-        <li><a href="index.html#how-it-works" class="nav-link">How it works</a></li>
+        <li><a href="index.html#features" class="nav-link"><span lang="en">Features</span><span lang="de">Funktionen</span></a></li>
+        <li><a href="index.html#how-it-works" class="nav-link"><span lang="en">How it works</span><span lang="de">So funktioniert's</span></a></li>
         <li>
           <a href="https://github.com/Shik3i/KoalaClicker" target="_blank" rel="noopener noreferrer"
              class="nav-link nav-github-link" aria-label="GitHub Repository">
@@ -35,6 +35,9 @@
             </svg>
             GitHub
           </a>
+        </li>
+        <li>
+          <button class="lang-toggle nav-link" aria-label="Auf Deutsch wechseln">🌐 DE</button>
         </li>
       </ul>
       <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
@@ -49,16 +52,19 @@
   <main class="subpage">
     <div class="container">
       <header class="subpage-header">
-        <span class="subpage-label">Legal</span>
-        <h1 class="subpage-title">Impressum / Legal Notice</h1>
-        <p class="subpage-date">Stand / As of: Mai 2026</p>
+        <span class="subpage-label"><span lang="en">Legal</span><span lang="de">Rechtliches</span></span>
+        <h1 class="subpage-title"><span lang="en">Legal Notice</span><span lang="de">Impressum</span></h1>
+        <p class="subpage-date">
+          <span lang="en">As of: May 2026</span>
+          <span lang="de">Stand: Mai 2026</span>
+        </p>
       </header>
 
       <div class="prose">
 
         <!-- ════ GERMAN SECTION ════ -->
         <div class="prose-block">
-          <div class="lang-section-de">
+          <div class="lang-section-de" lang="de">
             <span class="lang-label lang-label-de">Deutsch</span>
             <h2>🇩🇪 Impressum</h2>
 
@@ -91,8 +97,8 @@
               <span class="email-reveal"
                     role="button"
                     tabindex="0"
-                    data-user="koalaclicker"
-                    data-domain="koalastuff.net"
+                    data-user="koalaclick"
+                    data-domain="koalamail.rocks"
                     aria-label="E-Mail-Adresse anzeigen">
                 🔒 E-Mail-Adresse anzeigen
               </span>
@@ -127,11 +133,11 @@
           </div>
         </div>
 
-        <hr class="prose-divider">
+        <hr class="prose-divider" style="display: none;">
 
         <!-- ════ ENGLISH SECTION ════ -->
         <div class="prose-block">
-          <div class="lang-section-en">
+          <div class="lang-section-en" lang="en">
             <span class="lang-label lang-label-en">English</span>
             <h2>🇬🇧 Legal Notice</h2>
 
@@ -163,8 +169,8 @@
               <span class="email-reveal"
                     role="button"
                     tabindex="0"
-                    data-user="koalaclicker"
-                    data-domain="koalastuff.net"
+                    data-user="koalaclick"
+                    data-domain="koalamail.rocks"
                     aria-label="Reveal email address">
                 🔒 Click to reveal email address
               </span>

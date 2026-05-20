@@ -1720,3 +1720,40 @@ code {
   cursor: text;
   user-select: text;
 }
+
+/* --- Zero-flash language loading --- */
+html[lang="de"] [lang="en"],
+html[lang="en"] [lang="de"] {
+  display: none !important;
+}
+
+/* --- Language Toggle Nav Button --- */
+button.lang-toggle {
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+/* --- Premium Email Link (Revealed State) --- */
+.email-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text) !important;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  background: rgba(80, 250, 123, 0.1) !important;
+  border: 1px solid rgba(80, 250, 123, 0.3) !important;
+  border-radius: var(--radius-sm);
+  text-decoration: none !important;
+  transition: all var(--transition);
+  font-weight: 600;
+}
+
+.email-link:hover {
+  background: rgba(80, 250, 123, 0.18) !important;
+  border-color: rgba(80, 250, 123, 0.5) !important;
+  color: var(--green) !important;
+}

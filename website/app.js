@@ -125,18 +125,88 @@
     });
   }
 
+  /* ── Language Toggle (DE / EN) ─────────────────────── */
+  function initLangToggle() {
+    const STORAGE_KEY = 'koalaclicker-lang';
+    const DEFAULT_LANG = 'en';
+
+    // Read saved language or detect from browser
+    function getPreferredLang() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved === 'de' || saved === 'en') return saved;
+      return navigator.language && navigator.language.startsWith('de') ? 'de' : DEFAULT_LANG;
+    }
+
+    function applyLang(lang) {
+      document.documentElement.setAttribute('lang', lang);
+      localStorage.setItem(STORAGE_KEY, lang);
+
+      // Show/hide elements with lang attributes
+      document.querySelectorAll('[lang="de"], [lang="en"]').forEach((el) => {
+        // Skip the html element itself
+        if (el === document.documentElement) return;
+        el.style.display = el.getAttribute('lang') === lang ? '' : 'none';
+      });
+
+      // Update toggle button label
+      document.querySelectorAll('.lang-toggle').forEach((btn) => {
+        btn.textContent = lang === 'de' ? '🌐 EN' : '🌐 DE';
+        btn.setAttribute('aria-label', lang === 'de' ? 'Switch to English' : 'Auf Deutsch wechseln');
+        btn.setAttribute('aria-pressed', 'false');
+      });
+
+      // Update page title dynamically based on active language
+      const path = window.location.pathname;
+      if (path.endsWith('impressum.html')) {
+        document.title = lang === 'de' ? 'Impressum — KoalaClicker' : 'Legal Notice — KoalaClicker';
+      } else if (path.endsWith('datenschutz.html')) {
+        document.title = lang === 'de' ? 'Datenschutzerklärung — KoalaClicker' : 'Privacy Policy — KoalaClicker';
+      } else {
+        document.title = lang === 'de'
+          ? 'KoalaClicker — Privatsphäre-freundlicher Auto-Clicker für Idle-Games'
+          : 'KoalaClicker — Privacy-First Auto-Clicker for Idle Games';
+      }
+    }
+
+    function toggleLang() {
+      const current = document.documentElement.getAttribute('lang') || DEFAULT_LANG;
+      applyLang(current === 'de' ? 'en' : 'de');
+    }
+
+    // Wire up all toggle buttons
+    document.querySelectorAll('.lang-toggle').forEach((btn) => {
+      btn.addEventListener('click', toggleLang);
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleLang(); }
+      });
+    });
+
+    // Apply on load
+    applyLang(getPreferredLang());
+  }
+
   /* ── Email Reveal (for impressum/datenschutz) ──────── */
   function initEmailReveal() {
     document.querySelectorAll('.email-reveal').forEach((el) => {
-      el.addEventListener('click', function () {
+      function reveal() {
         if (this.dataset.revealed === 'true') return;
         const user = this.dataset.user;
         const domain = this.dataset.domain;
         if (user && domain) {
-          this.textContent = user + '@' + domain;
+          const address = user + '@' + domain;
+          this.textContent = address;
           this.dataset.revealed = 'true';
-          this.setAttribute('href', 'mailto:' + user + '@' + domain);
+          // Convert to a real mailto link
+          const link = document.createElement('a');
+          link.href = 'mailto:' + address;
+          link.textContent = address;
+          link.className = 'email-link';
+          this.replaceWith(link);
         }
+      }
+      el.addEventListener('click', reveal);
+      el.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal.call(this); }
       });
     });
   }
@@ -200,6 +270,7 @@
     initScrollReveal();
     initHamburger();
     initSmoothScroll();
+    initLangToggle();
     initEmailReveal();
     initMockupAnimation();
     initActiveNavLink();
