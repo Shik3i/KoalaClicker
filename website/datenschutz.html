@@ -63,8 +63,8 @@
       <div class="prose">
 
         <!-- ════ GERMAN SECTION ════ -->
-        <div class="prose-block">
-          <div class="lang-section-de" lang="de">
+        <div class="prose-block" lang="de">
+          <div class="lang-section-de">
             <span class="lang-label lang-label-de">Deutsch</span>
             <h2>🇩🇪 Datenschutzerklärung</h2>
 
@@ -75,14 +75,36 @@
 
             <h3>2. Grundsatz: Keine Datenerhebung</h3>
             <p>
-              <strong>Wir erheben, speichern oder übermitteln keinerlei personenbezogene Daten.</strong>
-              KoalaClicker arbeitet vollständig lokal auf Ihrem Gerät. Es gibt keine externe Server, keine Analytics, keine Telemetrie, keine Werbung und kein Tracking – in keiner Form.
+              <strong>Wir erheben, speichern oder übermitteln keinerlei personenbezogene Daten über die Extension.</strong>
+              KoalaClicker arbeitet vollständig lokal auf Ihrem Gerät. Es gibt keine externen Server für die Extension, keine Analytics, keine Telemetrie, keine Werbung und kein Tracking – in keiner Form.
             </p>
             <p>
               Die Extension macht <strong>keinerlei Netzwerkanfragen</strong> nach außen. Es werden keine Daten Ihres Geräts oder Ihres Browsings an Dritte übermittelt.
             </p>
 
-            <h3>3. Lokaler Speicher (chrome.storage.local)</h3>
+            <h3>3. Web-Hosting &amp; Server-Logs</h3>
+            <p>
+              Diese Informations-Webseite wird auf einem Server der <strong>Hetzner Online GmbH</strong> in deren Rechenzentrum in <strong>Helsinki, Finnland</strong> gehostet.
+            </p>
+            <p>
+              Beim Zugriff auf diese Webseite erfasst der Webserver automatisch typische Verbindungsdaten (Server-Logfiles). Dazu gehören:
+            </p>
+            <ul>
+              <li>Ihre IP-Adresse</li>
+              <li>Datum und Uhrzeit des Zugriffs</li>
+              <li>Aufgerufene Seite/Datei</li>
+              <li>HTTP-Statuscode</li>
+              <li>Browsertyp und Browserversion (User-Agent)</li>
+              <li>Referrer-URL (die zuvor besuchte Seite, sofern übermittelt)</li>
+            </ul>
+            <p>
+              Diese Daten werden ausschließlich zur Aufrechterhaltung des technischen Betriebs, zur Systemsicherheit und zur Fehleranalyse erhoben. Die Server-Logfiles werden automatisch nach <strong>7 Tagen</strong> rotiert bzw. vollständig gelöscht.
+            </p>
+            <p>
+              Es findet keine Zusammenführung dieser Daten mit anderen Datenquellen statt. Diese Logs werden zu keinem Zeitpunkt personalisiert, analysiert oder mit einer Person verknüpft oder an Dritte weitergegeben.
+            </p>
+
+            <h3>4. Lokaler Speicher (chrome.storage.local)</h3>
             <p>
               KoalaClicker verwendet <code>chrome.storage.local</code> ausschließlich, um Ihre konfigurierten Clicker (CSS-Selektoren, Intervalle und Namen) <strong>lokal auf Ihrem Gerät</strong> zu speichern. Diese Daten:
             </p>
@@ -93,7 +115,7 @@
               <li>können jederzeit durch Löschen der Extension vollständig entfernt werden</li>
             </ul>
 
-            <h3>4. Berechtigungen</h3>
+            <h3>5. Berechtigungen</h3>
             <p>KoalaClicker benötigt folgende Browser-Berechtigungen, die ausschließlich für die beschriebenen Funktionen genutzt werden:</p>
             <ul>
               <li>
@@ -113,22 +135,22 @@
               </li>
             </ul>
 
-            <h3>5. Drittanbieter</h3>
+            <h3>6. Drittanbieter</h3>
             <p>
               KoalaClicker integriert keinerlei Drittanbieter-Dienste, APIs, Analysetools, externe Schriftarten oder Tracking-Pixel. Die Extension ist vollständig ohne externe Abhängigkeiten gebaut.
             </p>
 
-            <h3>6. Open Source</h3>
+            <h3>7. Open Source</h3>
             <p>
               Der gesamte Quellcode ist öffentlich auf <a href="https://github.com/Shik3i/KoalaClicker" target="_blank" rel="noopener noreferrer">GitHub</a> einsehbar und auditierbar. Jeder kann die Funktionsweise der Extension unabhängig prüfen.
             </p>
 
-            <h3>7. Änderungen dieser Datenschutzerklärung</h3>
+            <h3>8. Änderungen dieser Datenschutzerklärung</h3>
             <p>
               Sollten sich Änderungen ergeben, wird das Datum am Anfang dieses Dokuments aktualisiert. Da wir keine Kontaktdaten erheben, empfehlen wir, diese Seite gelegentlich zu prüfen.
             </p>
 
-            <h3>8. Kontakt</h3>
+            <h3>9. Kontakt</h3>
             <p>
               Bei Fragen zum Datenschutz öffnen Sie bitte ein Issue auf unserem
               <a href="https://github.com/Shik3i/KoalaClicker/issues" target="_blank" rel="noopener noreferrer">GitHub-Repository</a>.
@@ -139,8 +161,8 @@
         <hr class="prose-divider" style="display: none;">
 
         <!-- ════ ENGLISH SECTION ════ -->
-        <div class="prose-block">
-          <div class="lang-section-en" lang="en">
+        <div class="prose-block" lang="en">
+          <div class="lang-section-en">
             <span class="lang-label lang-label-en">English</span>
             <h2>🇬🇧 Privacy Policy</h2>
 
@@ -151,14 +173,36 @@
 
             <h3>2. Core Principle: We Collect No Data</h3>
             <p>
-              <strong>We do not collect, store, or transmit any personal data whatsoever.</strong>
-              KoalaClicker operates entirely locally on your device. There are no external servers, no analytics, no telemetry, no advertising, and no tracking of any kind.
+              <strong>We do not collect, store, or transmit any personal data whatsoever via the extension.</strong>
+              KoalaClicker operates entirely locally on your device. There are no external servers for the extension, no analytics, no telemetry, no advertising, and no tracking of any kind.
             </p>
             <p>
               The extension makes <strong>zero outbound network requests</strong>. No data about your device or your browsing is ever sent to any third party.
             </p>
 
-            <h3>3. Local Storage (chrome.storage.local)</h3>
+            <h3>3. Web Hosting &amp; Server Logs</h3>
+            <p>
+              This informational landing page website is hosted on a server provided by <strong>Hetzner Online GmbH</strong> in their datacenter in <strong>Helsinki, Finland</strong>.
+            </p>
+            <p>
+              When you access this website, the web server automatically records typical connection data (server log files). This includes:
+            </p>
+            <ul>
+              <li>Your IP address</li>
+              <li>Date and time of access</li>
+              <li>Page/file accessed</li>
+              <li>HTTP status code</li>
+              <li>Browser type and version (user agent)</li>
+              <li>Referrer URL (the previously visited page, if transmitted)</li>
+            </ul>
+            <p>
+              This data is collected solely for maintaining technical operations, system security, and troubleshooting. The server log files are automatically rotated and completely deleted after <strong>7 days</strong>.
+            </p>
+            <p>
+              We do not combine this data with other data sources. These logs are never personalized, analyzed, linked to any individual, or shared with third parties.
+            </p>
+
+            <h3>4. Local Storage (chrome.storage.local)</h3>
             <p>
               KoalaClicker uses <code>chrome.storage.local</code> exclusively to save your configured clickers (CSS selectors, intervals, and names) <strong>locally on your device</strong>. This data:
             </p>
@@ -169,7 +213,7 @@
               <li>Can be fully removed at any time by uninstalling the extension</li>
             </ul>
 
-            <h3>4. Permissions Explained</h3>
+            <h3>5. Permissions Explained</h3>
             <p>KoalaClicker requires the following browser permissions, used solely for their described purpose:</p>
             <ul>
               <li>
@@ -188,22 +232,22 @@
               </li>
             </ul>
 
-            <h3>5. Third-Party Services</h3>
+            <h3>6. Third-Party Services</h3>
             <p>
               KoalaClicker does not integrate with any third-party services, APIs, analytics tools, external fonts, or tracking pixels. The extension is built entirely with zero external dependencies.
             </p>
 
-            <h3>6. Open Source</h3>
+            <h3>7. Open Source</h3>
             <p>
               The entire source code is publicly available and auditable on <a href="https://github.com/Shik3i/KoalaClicker" target="_blank" rel="noopener noreferrer">GitHub</a>. Anyone can independently verify exactly how the extension works.
             </p>
 
-            <h3>7. Changes to This Policy</h3>
+            <h3>8. Changes to This Policy</h3>
             <p>
               If this Privacy Policy is updated, the date at the top of this document will be revised. Since we do not collect contact information, we encourage you to review this page periodically.
             </p>
 
-            <h3>8. Contact</h3>
+            <h3>9. Contact</h3>
             <p>
               If you have any questions about this Privacy Policy, please open an issue on our
               <a href="https://github.com/Shik3i/KoalaClicker/issues" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
