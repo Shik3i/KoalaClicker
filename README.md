@@ -1,6 +1,8 @@
 <div align="center">
-  <img src="src/assets/Logo_Cut_128.png" width="96" height="96" alt="KoalaClicker Logo">
-  <h1>KoalaClicker</h1>
+  <h1>
+    <img src="src/assets/Logo_Cut_128.png" width="32" height="32" alt="KoalaClicker Logo" valign="middle">
+    KoalaClicker
+  </h1>
   <p><strong>A modern, privacy-first auto-clicker for idle games and repetitive web tasks.</strong></p>
 
   <p>
