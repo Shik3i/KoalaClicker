@@ -1757,3 +1757,11 @@ button.lang-toggle {
   border-color: rgba(80, 250, 123, 0.5) !important;
   color: var(--green) !important;
 }
+
+/* --- Premium Firefox Button Hover --- */
+.btn-firefox-hero:hover {
+  border-color: #ff7139 !important;
+  color: #ff7139 !important;
+  background: rgba(255, 113, 57, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(255, 113, 57, 0.15);
+}
