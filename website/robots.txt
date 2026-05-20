@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /datenschutz.html
+Disallow: /impressum.html
+
+Sitemap: https://koalaclicker.koalastuff.net/sitemap.xml
