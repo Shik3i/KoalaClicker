@@ -1,0 +1,32 @@
+# KoalaClicker Static Website Caddy Configuration
+# https://caddyserver.com
+
+koalaclicker.koalastuff.net {
+    # Path to the website static files
+    root * ./website
+    file_server
+
+    # Zstd and Gzip compression
+    encode zstd gzip
+
+    # Robust Security Headers (CSP, HSTS, X-Content-Type-Options)
+    header {
+        # Strict Content Security Policy (No inline scripts allowed)
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://raw.githubusercontent.com; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
+
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+        Permissions-Policy "interest-cohort=()"
+    }
+
+    # Clean URL handling (allows visiting /impressum instead of /impressum.html)
+    try_files {path} {path}.html {path}/ =404
+
+    # Custom 404 response
+    handle_errors {
+        respond "404 Not Found" 404
+    }
+}
