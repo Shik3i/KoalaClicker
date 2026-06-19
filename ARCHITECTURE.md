@@ -72,5 +72,5 @@ The `.github/workflows/release.yml` handles creating production-ready `.zip` fil
 When a tag like `v1.0.5` is pushed:
 1. It extracts `1.0.5` and injects it into `manifest.json`.
 2. It zips the `src/` folder for Chrome.
-3. It dynamically injects `browser_specific_settings` (required for Firefox MV3) into the manifest and zips the folder for Firefox.
+3. It dynamically injects `browser_specific_settings` (required for Firefox MV3) into the Firefox manifest and zips both browser folders.
 4. It creates a GitHub release and attaches the ZIPs.

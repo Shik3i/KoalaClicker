@@ -14,48 +14,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install jq
-        run: sudo apt-get install -y jq
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-      - name: Sync Manifest Version
-        run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          echo "Building version: $VERSION"
-          jq --arg v "$VERSION" '.version = $v' src/manifest.json > src/manifest.json.tmp
-          mv src/manifest.json.tmp src/manifest.json
-          # Verify injection succeeded
-          INJECTED=$(jq -r '.version' src/manifest.json)
-          if [ "$INJECTED" != "$VERSION" ]; then
-            echo "ERROR: Version injection failed! Expected '$VERSION', got '$INJECTED'"
-            exit 1
-          fi
-          echo "Manifest version verified: $INJECTED"
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Build Chrome Extension
-        run: |
-          mkdir -p build/chrome
-          cp -r src/* build/chrome/
-          cd build/chrome
-          zip -r ../../koalaclicker-chrome.zip .
-          cd ../..
-
-      - name: Build Firefox Extension
-        run: |
-          mkdir -p build/firefox
-          cp -r src/* build/firefox/
-          cd build/firefox
-          # Inject browser_specific_settings for Firefox MV3
-          jq '. + { "browser_specific_settings": { "gecko": { "id": "koalaclicker@shik3i.github.io", "strict_min_version": "109.0" } } }' manifest.json > manifest_tmp.json
-          mv manifest_tmp.json manifest.json
-          zip -r ../../koalaclicker-firefox.zip .
-          cd ../..
+      - name: Build browser extension ZIPs
+        run: npm run build:extension -- --version="${GITHUB_REF_NAME#v}"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            koalaclicker-chrome.zip
-            koalaclicker-firefox.zip
+          files: dist/*.zip
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

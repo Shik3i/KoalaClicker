@@ -1,0 +1,12 @@
+{
+  "name": "koalaclicker",
+  "version": "1.2.8",
+  "description": "KoalaClicker release build tooling",
+  "private": true,
+  "scripts": {
+    "build:extension": "node scripts/build-extension.cjs"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.1"
+  }
+}

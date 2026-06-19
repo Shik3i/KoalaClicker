@@ -10,7 +10,7 @@ Dieses Dokument dient als detaillierte Systembeschreibung und strategischer Prom
 ### Das Problem bestehender Auto-Clicker:
 1. **Sicherheitsrisiken & Datenschutz-Verstöße:** Die meisten Auto-Clicker im Chrome Web Store verlangen Berechtigungen für alle Webseiten (`<all_urls>` oder `*://*/*`). Dadurch können sie theoretisch den gesamten Browserverlauf auslesen, sensible Passwörter abfangen und Daten an externe Server senden.
 2. **Träges UI & Bloatware:** Viele Erweiterungen nutzen schwere Frameworks, verstopfen die DOM-Performance oder binden Tracking-Bibliotheken ein.
-3. **Erkennung durch Anti-Cheat-Systeme:** Spiele blockieren synthetisch generierte Klicks, wenn diese keine echten Koordinaten besitzen oder Timer-Eigenschaften aufweisen.
+3. **Timing-Kompatibilität bei Clicker-Games:** Manche Spiele ignorieren sehr schnelle synthetische Klicks, wenn lokale Zeitstempel nicht zu normalen Nutzereingaben passen.
 
 ### Die KoalaClicker-Lösung:
 KoalaClicker operiert nach dem Prinzip **"Privacy-First"**. Durch die Nutzung der `activeTab`-Berechtigung hat die Extension **keinerlei Zugriff** auf Webseiten, solange der User nicht explizit auf das Extension-Icon klickt. Es gibt **keine externen Abhängigkeiten (Zero Dependencies)**, kein Framework (reines Vanilla JS, HTML, CSS), keine externen Schriftarten und absolut keine Tracker. Zudem verfügt KoalaClicker über eine integrierte Umgehung für Spiel-Engines und eine hochpräzise Klicksimulation.
@@ -24,7 +24,7 @@ Für die Generierung von Store-Beschreibungen und technischen Rechtfertigungen m
 ### 1. Permission-Modell (Das wichtigste Argument für die Store-Zulassung)
 *   **`activeTab` (Aktivierte Registerkarte):** Die Extension injiziert Skripte *nur* auf expliziten Benutzerwunsch (Klick auf das Icon). Sie liest niemals im Hintergrund die Historie mit.
 *   **`storage` (Lokaler Speicher):** Konfigurierte Klicker (CSS-Selektoren, Klick-Intervalle und Aktiv-Status) werden ausschließlich lokal via `chrome.storage.local` auf dem Gerät des Nutzers gespeichert. Kein Server, keine Cloud, keine Datenübertragung.
-*   **`scripting` (Skripterstellung):** Ermöglicht das dynamische Ausführen des Content-Scripts im Kontext der aktiven Seite sowie das Injizieren des Anti-Cheat-Bypasses.
+*   **`scripting` (Skripterstellung):** Ermöglicht das dynamische Ausführen des Content-Scripts im Kontext der aktiven Seite sowie das Injizieren des Kompatibilitätshelfers.
 
 ### 2. Der Selektor-Generator (`generateSelector` in `content.js`)
 KoalaClicker findet Elemente auch nach Seiten-Reloads zuverlässig wieder.
@@ -39,9 +39,9 @@ Anstatt einfach nur `element.click()` aufzurufen, simuliert KoalaClicker ein vol
 *   **Element-Caching:** Zur Schonung der CPU-Leistung werden gefundene DOM-Elemente gecached (`elementCache`). Sollte ein Element aus dem DOM entfernt oder neu geladen werden (`!isConnected`), wird der Cache automatisch und ohne Memory-Leaks erneuert.
 *   **Sicherheitsgrenzen:** Das Klick-Intervall lässt sich bis auf minimale **25 ms** (40 Klicks pro Sekunde) herunterschrauben, wird aber nach unten hin abgeriegelt, um ein Einfrieren des Browsers zu verhindern. Bis zu **50 Klicker parallel** pro Webseite sind möglich.
 
-### 4. Game-Engine Bypass (`bypass.js`)
-*   Einige Spiele (z. B. Cookie Clicker) blockieren Klicks, die in extrem kurzen, unnatürlichen Abständen erfolgen, indem sie Zeitstempel vergleichen (z. B. `Game.lastClick`).
-*   KoalaClicker injiziert ein winziges Hilfsskript direkt in die **`MAIN`-Welt** der Webseite (wo der JS-Kontext des Spiels läuft). Dieses Skript setzt im Hintergrund kontinuierlich (alle 10 ms) bekannte Sperr-Variablen wie `Game.lastClick = 0` zurück. Das hebelt serverseitige oder clientseitige Klickbegrenzungen lokal aus.
+### 4. Game-Kompatibilität (`compatibility.js`)
+*   Einige Clicker-Games (z. B. Cookie Clicker) verwalten lokale Timing-Zustände wie `Game.lastClick`, die sehr schnelle Klickfolgen beeinflussen können.
+*   KoalaClicker injiziert ein winziges Hilfsskript direkt in die **`MAIN`-Welt** der Webseite (wo der JS-Kontext des Spiels läuft). Dieses Skript hält bekannte lokale Timing-Zustände kompatibel, damit der vom Nutzer konfigurierte Klickrhythmus zuverlässig registriert wird.
 
 ---
 
@@ -81,7 +81,7 @@ Der Chrome Web Store ist extrem streng bei der Freigabe. Gemini Pro muss diese A
 3.  **Sicherheit und Code-Qualität:**
     *   Kein `eval()` oder dynamische Code-Ausführung aus externen Quellen.
     *   Reiner, lesbarer Vanilla-Code.
-    *   Sichere CSP (Content Security Policy) Einhaltung durch Trennung von Main-World Injection (`bypass.js`) und Isolated Content Script (`content.js`).
+    *   Sichere CSP (Content Security Policy) Einhaltung durch Trennung von Main-World Injection (`compatibility.js`) und Isolated Content Script (`content.js`).
 
 ---
 
@@ -98,7 +98,7 @@ Bitte generiere mir nun folgende Marketing-Texte für den Chrome Web Store in er
 2. Eine ausführliche "Long Description" (Ausführliche Beschreibung, strukturiert mit Emojis, Bullet Points und Zwischenüberschriften). Gehe dabei besonders auf folgende Aspekte ein:
    - Warum KoalaClicker sicherer und privater ist als alle anderen Clicker (activeTab).
    - Die extrem intuitive Bedienung (Element anklicken zum Auswählen, Live-Highlighting beim Hovern).
-   - Technische Vorteile (Mehrere Clicker gleichzeitig, Anti-Cheat-Bypass für Spiele wie Cookie Clicker, extrem ressourcenschonend ohne Bloat).
+   - Technische Vorteile (Mehrere Clicker gleichzeitig, Kompatibilitätshelfer für Spiele wie Cookie Clicker, extrem ressourcenschonend ohne Bloat).
    - Eine kurze Schritt-für-Schritt-Anleitung zur Nutzung.
 3. Einen "Promo Text" (maximal 120 Wörter) für Banner-Platzierungen.
 
@@ -112,8 +112,8 @@ Bitte schreibe mir auf Englisch (da die Google-Reviewer meist Englisch sprechen)
 
 1. Die Permission "activeTab": Erkläre, dass wir dadurch das Auslesen fremder Tabs komplett unterbinden und die Skripte nur dann injizieren, wenn der Nutzer die Extension explizit aufruft (Sicherheit/Datenschutz).
 2. Die Permission "storage": Erkläre, dass wir dies ausschließlich lokal verwenden, um die vom Benutzer erstellten Selektoren und Intervalle zu sichern, damit diese beim nächsten Besuch der Seite wieder zur Verfügung stehen – ohne dass Daten an Server übertragen werden.
-3. Die Permission "scripting": Erkläre, dass diese zwingend benötigt wird, um den Klick-Simulations-Loop (Content Script) und das native Bypass-Skript im Tab auszuführen.
-4. Den Eintrag "web_accessible_resources" für "content/bypass.js": Erkläre, warum dieses Skript in den Hauptkontext geladen werden muss (Bypass von spielinternen Sperren/Anti-Cheat-Mechaniken im nativen Fensterkontext).
+3. Die Permission "scripting": Erkläre, dass diese zwingend benötigt wird, um den Klick-Simulations-Loop (Content Script) und das native Kompatibilitätsskript im Tab auszuführen.
+4. Erkläre, warum keine `web_accessible_resources` deklariert sind: Die Extension injiziert eigene Dateien über `chrome.scripting`, ohne sie Webseiten allgemein als abrufbare Ressourcen offenzulegen.
 
 Formuliere die Antworten so respektvoll, klar und technisch fundiert wie möglich!
 ```

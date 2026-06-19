@@ -27,7 +27,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const urlObj = new URL(tab.url);
-  const siteKey = urlObj.origin + urlObj.pathname;
+  const siteKey = urlObj.origin;
+  const legacySiteKey = urlObj.origin + urlObj.pathname;
 
   // Inject content script if not already injected
   try {
@@ -70,15 +71,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         target: { tabId: tabId },
         files: ['content/content.js']
       });
-      // Inject native MAIN-world bypass script (CSP immune)
+      // Inject native MAIN-world compatibility script (CSP immune)
       try {
         await chrome.scripting.executeScript({
           target: { tabId: tabId },
           world: 'MAIN',
-          files: ['content/bypass.js']
+          files: ['content/compatibility.js']
         });
-      } catch (bypassError) {
-        console.warn("KoalaClicker: Failed to inject main-world bypass script.", bypassError);
+      } catch (compatibilityError) {
+        console.warn("KoalaClicker: Failed to inject main-world compatibility script.", compatibilityError);
       }
       // Give it a tiny moment to initialize
       await new Promise(r => setTimeout(r, 50));
@@ -86,8 +87,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function loadAndRenderClickers() {
-    chrome.storage.local.get([siteKey], (result) => {
-      const clickers = result[siteKey] || [];
+    chrome.storage.local.get([siteKey, legacySiteKey], (result) => {
+      const clickers = result[siteKey] || result[legacySiteKey] || [];
+
+      if (!result[siteKey] && result[legacySiteKey]) {
+        chrome.storage.local.set({ [siteKey]: result[legacySiteKey] });
+      }
       
       if (clickers.length === 0) {
         emptyState.style.display = 'block';

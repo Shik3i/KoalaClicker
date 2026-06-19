@@ -39,7 +39,7 @@ Unlike most auto-clickers on the market, KoalaClicker uses the **`activeTab` per
 | 🔒 **Privacy First** | Uses `activeTab` only. No access to any tab until you click the icon. Zero tracking, zero telemetry, 100% ad-free. |
 | 🎯 **Multiple Clickers** | Add up to **50 parallel clickers** per website, each with its own interval and label. |
 | ⚡ **Ultra-Fast Clicking** | Minimum interval of **25ms** (40 clicks/sec). Handles multiple elements simultaneously. |
-| 🎮 **Game Engine Bypass** | Automatically bypasses anti-cheat cooldown variables (e.g. `Game.lastClick` in Cookie Clicker). |
+| 🎮 **Game Compatibility** | Keeps supported clicker games responsive at very low intervals using a tiny page-context helper. |
 | ✏️ **Inline Editing** | Rename clickers, adjust intervals, start/stop individually — all live in the popup. |
 | 👁 **Live Highlighting** | Hover over a clicker card in the popup and the corresponding element is highlighted on the page in real time. |
 | 💾 **State Resumption** | Clickers are saved per-site. Reopen the popup after a page reload to resume instantly. |
@@ -79,7 +79,7 @@ Unlike most auto-clickers on the market, KoalaClicker uses the **`activeTab` per
 5. **Click** the element to register it. The clicker starts immediately!
 6. Reopen the popup anytime to rename, adjust the speed, pause, or delete clickers.
 
-> 💡 **Pro Tip:** After a page reload, just click the extension icon again — all your clickers reload and resume automatically.
+> 💡 **Pro Tip:** After a page reload, click the extension icon once — active clickers for that website reload and resume.
 
 ---
 
@@ -108,9 +108,9 @@ cd KoalaClicker
 - All extension code lives in [`src/`](src/)
 - Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for a full breakdown of the data flows and component design
 - Read [`USAGE.md`](USAGE.md) for the full user guide and FAQ
-- The GitHub Actions workflow in [`.github/workflows/release.yml`](.github/workflows/release.yml) automatically injects the tag version into `manifest.json` and builds both Chrome and Firefox ZIPs on every `v*.*.*` tag push
+- The GitHub Actions workflow in [`.github/workflows/release.yml`](.github/workflows/release.yml) uses the local build script to inject the tag version and build both Chrome and Firefox ZIPs on every `v*.*.*` tag push
 
-**Stack:** Vanilla JS · Vanilla CSS · HTML5 · Manifest V3 · Zero npm
+**Stack:** Vanilla JS · Vanilla CSS · HTML5 · Manifest V3 · Zero runtime dependencies
 
 ---
 

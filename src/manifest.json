@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "KoalaClicker",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "Privacy-first auto-clicker for idle games & web tasks. Zero tracking, zero dependencies. Uses activeTab only — your data never leaves your device.",
   "icons": {
     "16": "assets/Logo_Cut_16.png",
@@ -21,17 +21,8 @@
     "storage",
     "scripting"
   ],
+  "minimum_chrome_version": "95",
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "content/bypass.js"
-      ],
-      "matches": [
-        "*://*/*"
-      ]
-    }
-  ]
+  }
 }

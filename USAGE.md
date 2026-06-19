@@ -17,7 +17,7 @@ Navigate to the webpage where you want to automate clicks, and click the **Koala
 *   Simply hover over any clickable element on the page (like a button, image, or link) and **click it**. 
 
 ### Step 3: Configure and Click!
-*   The element will immediately start being clicked. 
+*   The element will immediately start being clicked.
 *   Reopen the popup at any time to:
     *   **Toggle active status**: Start or stop individual clickers instantly.
     *   **Adjust interval**: Type a custom click speed in milliseconds (`ms`). The minimum interval is a blazing-fast **25ms** (40 clicks per second!).
@@ -38,15 +38,15 @@ To protect your credentials and browsing history, we use the `activeTab` permiss
 
 ## 💡 Advanced Tips
 
-### 🏎️ Maximize Clicking Speed (Bypassing Limits)
-Some games or websites have anti-cheat mechanisms that try to detect automated clicks by reading timing offsets.
-*   KoalaClicker features an **automatic game-engine bypass** (injected securely as `bypass.js`).
-*   It continually resets common anti-cheat variables (such as `Game.lastClick` in *Cookie Clicker*) to ensure your clicks register even at ultra-low intervals like **25ms**.
+### 🏎️ Maximize Clicking Speed
+Some clicker games track timing state in the page context and may ignore very rapid synthetic clicks.
+*   KoalaClicker includes a small **game compatibility helper** (injected securely as `compatibility.js`).
+*   For supported games such as *Cookie Clicker*, it keeps local timing state responsive so your clicks can register at low intervals like **25ms**.
 *   To keep your browser responsive, we recommend keeping intervals above **50ms** if you have more than 10 clickers active simultaneously.
 
 ### 🎯 Targeting Elements Without IDs
 Many modern websites use dynamic, randomized CSS class names and IDs (e.g., `button-abc123xyz` or `css-92hf84`). 
-*   KoalaClicker automatically detects and bypasses these dynamic IDs using smart pattern matching.
+*   KoalaClicker automatically avoids these dynamic IDs using smart pattern matching.
 *   If an element does not have a stable ID, it climbs up the DOM tree and creates a robust structural path (e.g. `body > div > main > button:nth-of-type(3)`).
 *   If a button is not registering, try selecting its parent container or target the text directly!
 

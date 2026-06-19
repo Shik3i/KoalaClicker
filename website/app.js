@@ -185,6 +185,15 @@
     applyLang(getPreferredLang());
   }
 
+  function initVersionLabels() {
+    const version = document.querySelector('meta[name="koalaclicker-version"]')?.content;
+    if (!version) return;
+
+    document.querySelectorAll('[data-koalaclicker-version]').forEach((el) => {
+      el.textContent = `v${version}`;
+    });
+  }
+
   /* ── Email Reveal (for impressum/datenschutz) ──────── */
   function initEmailReveal() {
     document.querySelectorAll('.email-reveal').forEach((el) => {
@@ -266,6 +275,7 @@
 
   /* ── Init ──────────────────────────────────────────── */
   function init() {
+    initVersionLabels();
     initNavScroll();
     initScrollReveal();
     initHamburger();

@@ -18,7 +18,7 @@
   `;
   document.documentElement.appendChild(banner);
 
-  // Note: MAIN-world bypass script is now injected natively by popup.js to resist CSP blocks.
+  // Note: MAIN-world compatibility script is injected natively by popup.js to resist CSP blocks.
 
   banner.querySelector('#koala-cancel-btn').addEventListener('click', () => {
     exitSelectionMode();
@@ -159,12 +159,27 @@
   function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'koala-clicker-toast';
-    toast.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#bd93f9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
-        <polyline points="20 6 9 17 4 12"></polyline>
-      </svg>
-      <span>${message}</span>
-    `;
+
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('width', '16');
+    icon.setAttribute('height', '16');
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.setAttribute('fill', 'none');
+    icon.setAttribute('stroke', '#bd93f9');
+    icon.setAttribute('stroke-width', '2.5');
+    icon.setAttribute('stroke-linecap', 'round');
+    icon.setAttribute('stroke-linejoin', 'round');
+    icon.style.flexShrink = '0';
+
+    const check = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    check.setAttribute('points', '20 6 9 17 4 12');
+    icon.appendChild(check);
+
+    const text = document.createElement('span');
+    text.textContent = message;
+
+    toast.appendChild(icon);
+    toast.appendChild(text);
     document.documentElement.appendChild(toast);
     
     // Trigger animation
@@ -181,7 +196,7 @@
     chrome.storage.local.get([currentSiteKey], (result) => {
       const clickers = result[currentSiteKey] || [];
       if (clickers.length >= 50) {
-        alert("KoalaClicker: Maximum of 50 clickers per page reached.");
+        alert("KoalaClicker: Maximum of 50 clickers per website reached.");
         return;
       }
       const clickerName = "Clicker " + (clickers.length + 1);
@@ -190,7 +205,7 @@
         selector: selector,
         name: clickerName,
         interval: 250, // Default interval
-        active: false,
+        active: true,
         id: Date.now().toString()
       });
       

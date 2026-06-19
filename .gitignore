@@ -1,5 +1,6 @@
 # Build artifacts
 build/
+dist/
 *.zip
 
 # IDEs and Editors
