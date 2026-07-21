@@ -33,15 +33,15 @@ KoalaClicker findet Elemente auch nach Seiten-Reloads zuverlässig wieder.
 *   **Robuste DOM-Traversierung:** Falls keine statische ID existiert, klettert das Skript den DOM-Baum hinauf und baut einen CSS-Pfad unter Nutzung von `:nth-of-type()` relativ zu den Geschwisterelementen (z. B. `body > div#app > main > button:nth-of-type(2)`).
 
 ### 3. Hochpräzise Klick-Simulation (`triggerClick`)
-Anstatt einfach nur `element.click()` aufzurufen, simuliert KoalaClicker ein vollkommen realistisches Nutzerverhalten im Browser:
+Anstatt nur `element.click()` aufzurufen, sendet KoalaClicker eine vollständige synthetische Mouse-Event-Sequenz. Diese Events bleiben technisch als nicht vertrauenswürdig (`isTrusted === false`) erkennbar; einzelne Webseiten können synthetische Eingaben daher ablehnen:
 *   **Dynamische Koordinatenberechnung:** Nutzt `getBoundingClientRect()`, um das exakte Zentrum des Elements zu berechnen – selbst wenn sich das Element bewegt.
-*   **Vollständige Event-Sequenz:** Feuert nacheinander die echten Events `mousedown` ➔ `mouseup` ➔ `click` mit den berechneten Koordinaten ab.
+*   **Vollständige Event-Sequenz:** Feuert nacheinander synthetische `mousedown` ➔ `mouseup` ➔ `click` Events mit den berechneten Koordinaten ab.
 *   **Element-Caching:** Zur Schonung der CPU-Leistung werden gefundene DOM-Elemente gecached (`elementCache`). Sollte ein Element aus dem DOM entfernt oder neu geladen werden (`!isConnected`), wird der Cache automatisch und ohne Memory-Leaks erneuert.
 *   **Sicherheitsgrenzen:** Das Klick-Intervall lässt sich bis auf minimale **25 ms** (40 Klicks pro Sekunde) herunterschrauben, wird aber nach unten hin abgeriegelt, um ein Einfrieren des Browsers zu verhindern. Bis zu **50 Klicker parallel** pro Webseite sind möglich.
 
 ### 4. Game-Kompatibilität (`compatibility.js`)
 *   Einige Clicker-Games (z. B. Cookie Clicker) verwalten lokale Timing-Zustände wie `Game.lastClick`, die sehr schnelle Klickfolgen beeinflussen können.
-*   KoalaClicker injiziert ein winziges Hilfsskript direkt in die **`MAIN`-Welt** der Webseite (wo der JS-Kontext des Spiels läuft). Dieses Skript hält bekannte lokale Timing-Zustände kompatibel, damit der vom Nutzer konfigurierte Klickrhythmus zuverlässig registriert wird.
+*   KoalaClicker injiziert ein winziges Hilfsskript direkt in die **`MAIN`-Welt** der Webseite. Es reagiert ausschließlich unmittelbar vor einem tatsächlich konfigurierten Klick und setzt keinen dauerhaften Hintergrund-Timer ein.
 
 ---
 

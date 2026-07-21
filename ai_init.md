@@ -17,5 +17,5 @@ If you are a new AI agent assigned to work on this repository, **you must comple
 
 1. **Read `ARCHITECTURE.md`**: This is your single source of truth. It details the `activeTab` constraints, how state is preserved in `chrome.storage.local`, and how the Popup communicates with the Content Script via Message Passing.
 2. **Review the Data Flow**: Understand that the Content Script is *stateless*. The Popup acts as the orchestrator. If the user reloads the page, the Content Script dies. Opening the popup is the *only* way to re-inject the script and resume the auto-clickers.
-3. **Understand the Build System**: Review `.github/workflows/release.yml`. Do not attempt to add `webpack`, `rollup`, or `npm scripts`. The GitHub Action handles zipping and Manifest adjustments automatically.
+3. **Understand the Build System**: Review `.github/workflows/check.yml`, `.github/workflows/release.yml`, and the existing npm scripts. Do not add bundlers such as `webpack` or `rollup`. The build script handles zipping and browser-specific manifest adjustments automatically.
 4. **Inspect the CSS Selectors**: Look at `generateSelector` in `src/content/content.js`. Any modifications to how elements are identified must remain robust across page reloads.

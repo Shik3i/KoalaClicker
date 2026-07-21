@@ -277,6 +277,11 @@
         clientY: clientY
       };
 
+      // Let the optional MAIN-world helper prepare compatible clicker games
+      // immediately before an actual user-configured click. DOM events cross
+      // the isolated-world boundary without exposing extension APIs.
+      document.dispatchEvent(new CustomEvent('koala-clicker:before-click'));
+
       // Simulate a complete real click sequence
       cached.el.dispatchEvent(new MouseEvent('mousedown', eventOptions));
       cached.el.dispatchEvent(new MouseEvent('mouseup', eventOptions));

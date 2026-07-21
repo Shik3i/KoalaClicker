@@ -102,13 +102,16 @@ Read the full [Privacy Policy](PRIVACY.md).
 ```bash
 git clone https://github.com/Shik3i/KoalaClicker.git
 cd KoalaClicker
-# Load the /src folder as an unpacked extension in chrome://extensions/
+npm ci
+npm run check
+# Load the /dist/chrome folder as an unpacked extension in chrome://extensions/
 ```
 
 - All extension code lives in [`src/`](src/)
 - Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for a full breakdown of the data flows and component design
 - Read [`USAGE.md`](USAGE.md) for the full user guide and FAQ
 - The GitHub Actions workflow in [`.github/workflows/release.yml`](.github/workflows/release.yml) uses the local build script to inject the tag version and build both Chrome and Firefox ZIPs on every `v*.*.*` tag push
+- Store-ready artwork, screenshots, listing copy, and the submission checklist live in [`assets/store/`](assets/store/)
 
 **Stack:** Vanilla JS · Vanilla CSS · HTML5 · Manifest V3 · Zero runtime dependencies
 

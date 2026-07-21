@@ -74,3 +74,13 @@ When a tag like `v1.0.5` is pushed:
 2. It zips the `src/` folder for Chrome.
 3. It dynamically injects `browser_specific_settings` (required for Firefox MV3) into the Firefox manifest and zips both browser folders.
 4. It creates a GitHub release and attaches the ZIPs.
+
+The Firefox package targets Firefox Desktop 140+ and Firefox for Android 142+.
+These versions support both MAIN-world script execution and Mozilla's built-in
+data-collection declaration. KoalaClicker declares `none` because it does not
+transmit data outside the local browser.
+
+The MAIN-world compatibility helper is event-driven. It receives a DOM event
+immediately before an active clicker dispatches its synthetic mouse-event
+sequence. It does not poll, run a background interval, or modify page state
+while KoalaClicker is idle.
