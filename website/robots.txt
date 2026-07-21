@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://koalaclicker.koalastuff.net/sitemap.xml
+Sitemap: https://clicker.koalastuff.net/sitemap.xml

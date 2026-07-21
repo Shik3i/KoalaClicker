@@ -53,7 +53,7 @@ If using Nginx, configure your site block as follows to achieve similar clean UR
 ```nginx
 server {
     listen 80;
-    server_name koalaclicker.koalastuff.net;
+    server_name clicker.koalastuff.net;
     root /var/www/koalaclicker/website;
     index index.html;
 

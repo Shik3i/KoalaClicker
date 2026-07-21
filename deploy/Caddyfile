@@ -1,7 +1,7 @@
 # KoalaClicker Static Website Caddy Configuration
 # https://caddyserver.com
 
-koalaclicker.koalastuff.net {
+clicker.koalastuff.net {
     # Path to the website static files
     root * ./website
     file_server

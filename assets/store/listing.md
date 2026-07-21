@@ -67,7 +67,7 @@ compatibility helper into the user-invoked active tab. No remote code is loaded.
 - Declare local handling accurately: the extension processes website origin,
   selected-element CSS selectors, and clicker configuration locally.
 - Privacy policy URL:
-  `https://koalaclicker.koalastuff.net/datenschutz.html`
+  `https://clicker.koalastuff.net/datenschutz.html`
 
 ## Firefox data collection
 
