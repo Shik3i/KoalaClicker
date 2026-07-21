@@ -26,7 +26,7 @@ Features:
 - Start, stop, rename, and delete clickers independently
 - Live element highlighting
 - Local per-site configuration
-- No accounts, analytics, advertising, telemetry, or network requests
+- No accounts, analytics, advertising, telemetry, or automatic network requests
 - Open-source, readable Manifest V3 code
 
 Privacy by design:
@@ -40,6 +40,9 @@ Compatibility note:
 
 KoalaClicker sends synthetic mouse events. Websites can detect or reject
 synthetic input, so compatibility cannot be guaranteed for every page.
+On the official Cookie Clicker host (`orteil.dashnet.org`), a packaged
+MAIN-world helper resets Cookie Clicker's local `Game.lastClick` timing field
+immediately before a user-configured click. It is inactive on every other host.
 
 ## Permission justifications
 

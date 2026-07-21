@@ -219,7 +219,9 @@
   }
 
   function syncClickers(clickers) {
+    clickers = KoalaClickerModel.normalizeClickers(clickers);
     const newActiveIds = clickers.filter(c => c.active).map(c => c.id);
+    const retainedSelectors = new Set(clickers.map(c => c.selector));
     
     // Stop deleted or deactivated clickers
     for (const id in activeTimers) {
@@ -229,10 +231,14 @@
       }
     }
 
+    for (const selector of Object.keys(elementCache)) {
+      if (!retainedSelectors.has(selector)) delete elementCache[selector];
+    }
+
     // Start or update active clickers safely
     clickers.forEach(clicker => {
       if (clicker.active) {
-        const safeInterval = Math.max(25, parseInt(clicker.interval, 10) || 250);
+        const safeInterval = clicker.interval;
         const existing = activeTimers[clicker.id];
         
         // ONLY restart if the timer doesn't exist, or the timing value changed

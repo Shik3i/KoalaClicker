@@ -11,6 +11,18 @@ const versionArg = process.argv.find((arg) => arg.startsWith('--version='));
 const releaseVersion = versionArg
   ? versionArg.slice('--version='.length)
   : process.env.VERSION || null;
+const zipDate = new Date('1980-01-01T00:00:00.000Z');
+
+function validateVersion(version) {
+  if (!/^\d+(\.\d+){0,3}$/.test(version)) {
+    throw new Error(`Invalid extension version "${version}"`);
+  }
+
+  const parts = version.split('.').map(Number);
+  if (parts.some(part => part > 65535)) {
+    throw new Error(`Extension version component exceeds 65535: "${version}"`);
+  }
+}
 
 function readManifest() {
   return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
@@ -64,6 +76,7 @@ function writeManifest(targetDir, browserName, modifier) {
   if (releaseVersion) {
     manifest.version = releaseVersion.replace(/^v/, '');
   }
+  validateVersion(manifest.version);
 
   const browserManifest = modifier(manifest);
   validateManifest(browserManifest, browserName);
@@ -83,7 +96,19 @@ function zipDirectory(sourceDir, outputPath) {
 
     stream.on('close', resolve);
     archive.on('error', reject);
-    archive.directory(sourceDir, false);
+    const addFiles = (directory) => {
+      for (const item of fs.readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+        const itemPath = path.join(directory, item.name);
+        if (item.isDirectory()) addFiles(itemPath);
+        else archive.append(fs.readFileSync(itemPath), {
+          name: path.relative(sourceDir, itemPath).split(path.sep).join('/'),
+          date: zipDate,
+          mode: 0o100644
+        });
+      }
+    };
+
+    addFiles(sourceDir);
     archive.pipe(stream);
     archive.finalize();
   });

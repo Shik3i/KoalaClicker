@@ -12,10 +12,10 @@ jobs:
       contents: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: 22
           cache: npm
@@ -29,10 +29,20 @@ jobs:
       - name: Build browser extension ZIPs
         run: npm run build:extension -- --version="${GITHUB_REF_NAME#v}"
 
+      - name: Build reviewer source archive and checksums
+        run: |
+          git archive --format=zip --output="dist/koalaclicker-source-${GITHUB_REF_NAME}.zip" HEAD
+          cd dist
+          sha256sum koalaclicker-*.zip > SHA256SUMS
+
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
-          files: dist/*.zip
+          files: |
+            dist/koalaclicker-chrome-*.zip
+            dist/koalaclicker-firefox-*.zip
+            dist/koalaclicker-source-*.zip
+            dist/SHA256SUMS
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

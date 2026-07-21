@@ -40,8 +40,8 @@ Anstatt nur `element.click()` aufzurufen, sendet KoalaClicker eine vollständige
 *   **Sicherheitsgrenzen:** Das Klick-Intervall lässt sich bis auf minimale **25 ms** (40 Klicks pro Sekunde) herunterschrauben, wird aber nach unten hin abgeriegelt, um ein Einfrieren des Browsers zu verhindern. Bis zu **50 Klicker parallel** pro Webseite sind möglich.
 
 ### 4. Game-Kompatibilität (`compatibility.js`)
-*   Einige Clicker-Games (z. B. Cookie Clicker) verwalten lokale Timing-Zustände wie `Game.lastClick`, die sehr schnelle Klickfolgen beeinflussen können.
-*   KoalaClicker injiziert ein winziges Hilfsskript direkt in die **`MAIN`-Welt** der Webseite. Es reagiert ausschließlich unmittelbar vor einem tatsächlich konfigurierten Klick und setzt keinen dauerhaften Hintergrund-Timer ein.
+*   Der Helper ist ausschließlich auf `https://orteil.dashnet.org` aktiv und passt dort den lokalen Cookie-Clicker-Zeitstempel `Game.lastClick` unmittelbar vor einem konfigurierten Klick an.
+*   KoalaClicker injiziert das Hilfsskript in die **`MAIN`-Welt**. Auf allen anderen Hosts bleibt es ohne Wirkung; es nutzt keinen dauerhaften Hintergrund-Timer.
 
 ---
 
@@ -75,7 +75,7 @@ Der Chrome Web Store ist extrem streng bei der Freigabe. Gemini Pro muss diese A
 1.  **Single-Purpose Policy (Einzige Zweckbestimmung):** Die Erweiterung hat genau eine Funktion: Sie ermöglicht das automatisierte Klicken auf vom Benutzer definierte Web-Elemente. Keine versteckten Features.
 2.  **User Data Policy (Umgang mit Nutzerdaten):**
     *   *Keine Erfassung personenbezogener Daten.*
-    *   *Keine Übertragung von Daten über das Netzwerk.*
+    *   *Keine automatischen Netzwerkzugriffe und keine Übertragung von Browsing- oder Klicker-Daten. Externe Links werden nur nach einem ausdrücklichen Nutzer-Klick geöffnet.*
     *   *Kein Tracking, keine Analytics.*
     *   *Lokale Speicherung ist rein funktional.*
 3.  **Sicherheit und Code-Qualität:**

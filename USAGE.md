@@ -40,7 +40,7 @@ To protect your credentials and browsing history, we use the `activeTab` permiss
 
 ### 🏎️ Maximize Clicking Speed
 Some clicker games track timing state in the page context and may ignore very rapid synthetic clicks.
-*   KoalaClicker includes a small **game compatibility helper** (injected securely as `compatibility.js`).
+*   On the official Cookie Clicker host (`orteil.dashnet.org`), KoalaClicker injects a small **game compatibility helper** (`compatibility.js`) that adjusts Cookie Clicker's local click timing immediately before configured clicks. It remains inactive on all other hosts.
 *   For supported games such as *Cookie Clicker*, it keeps local timing state responsive so your clicks can register at low intervals like **25ms**.
 *   To keep your browser responsive, we recommend keeping intervals above **50ms** if you have more than 10 clickers active simultaneously.
 

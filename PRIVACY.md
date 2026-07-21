@@ -22,6 +22,8 @@ KoalaClicker does not integrate with any third-party services, APIs, or fonts. I
 ## 4. Chrome Web Store Limited Use
 KoalaClicker's use of information received from browser APIs is limited to providing and improving its single user-facing auto-clicking purpose. The extension does not transfer this information, use it for advertising, determine creditworthiness, or allow humans to read it.
 
+The use of information received from Google APIs will adhere to the Chrome Web Store User Data Policy, including the Limited Use requirements.
+
 ## 5. Data Retention and Deletion
 Saved clicker configurations remain in local browser storage until the user deletes them or uninstalls the extension. KoalaClicker has no remote copy and cannot restore deleted local data.
 

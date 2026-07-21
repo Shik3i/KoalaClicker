@@ -80,7 +80,8 @@ These versions support both MAIN-world script execution and Mozilla's built-in
 data-collection declaration. KoalaClicker declares `none` because it does not
 transmit data outside the local browser.
 
-The MAIN-world compatibility helper is event-driven. It receives a DOM event
-immediately before an active clicker dispatches its synthetic mouse-event
-sequence. It does not poll, run a background interval, or modify page state
-while KoalaClicker is idle.
+The MAIN-world compatibility helper is limited to `orteil.dashnet.org` and is
+event-driven. It receives a DOM event immediately before an active clicker
+dispatches its synthetic mouse-event sequence. It does not poll, run a
+background interval, affect other hosts, or modify page state while
+KoalaClicker is idle.

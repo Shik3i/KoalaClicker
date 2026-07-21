@@ -1,14 +1,16 @@
 {
   "name": "koalaclicker",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "description": "KoalaClicker release build tooling",
   "private": true,
   "scripts": {
     "build:extension": "node scripts/build-extension.cjs",
     "test": "node --test scripts/test-extension.mjs",
-    "check": "npm run build:extension && npm test"
+    "lint:firefox": "addons-linter dist/firefox --output text",
+    "check": "npm run build:extension && npm test && npm run lint:firefox"
   },
   "devDependencies": {
+    "addons-linter": "10.9.0",
     "archiver": "^7.0.1"
   },
   "overrides": {

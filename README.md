@@ -39,7 +39,7 @@ Unlike most auto-clickers on the market, KoalaClicker uses the **`activeTab` per
 | 🔒 **Privacy First** | Uses `activeTab` only. No access to any tab until you click the icon. Zero tracking, zero telemetry, 100% ad-free. |
 | 🎯 **Multiple Clickers** | Add up to **50 parallel clickers** per website, each with its own interval and label. |
 | ⚡ **Ultra-Fast Clicking** | Minimum interval of **25ms** (40 clicks/sec). Handles multiple elements simultaneously. |
-| 🎮 **Game Compatibility** | Keeps supported clicker games responsive at very low intervals using a tiny page-context helper. |
+| 🎮 **Cookie Clicker Compatibility** | Applies a narrowly scoped timing adjustment only on the official Cookie Clicker host. |
 | ✏️ **Inline Editing** | Rename clickers, adjust intervals, start/stop individually — all live in the popup. |
 | 👁 **Live Highlighting** | Hover over a clicker card in the popup and the corresponding element is highlighted on the page in real time. |
 | 💾 **State Resumption** | Clickers are saved per-site. Reopen the popup after a page reload to resume instantly. |
@@ -88,7 +88,7 @@ Unlike most auto-clickers on the market, KoalaClicker uses the **`activeTab` per
 KoalaClicker is designed to be the most privacy-respecting auto-clicker available:
 
 - **`activeTab` only**: The extension gains page access *only* when you explicitly click its icon. It cannot read your browsing history, access other tabs, or run in the background.
-- **No network requests**: KoalaClicker makes zero outbound network calls. Ever.
+- **No background requests**: KoalaClicker sends no browsing or clicker data anywhere and performs no automatic network requests. External links open only after a user click.
 - **Local storage only**: Your configurations (selectors, intervals, names) are stored exclusively in `chrome.storage.local` on your device.
 - **No eval()**: No dynamic code execution from external sources.
 - **Open Source**: The entire codebase is here for you to audit.

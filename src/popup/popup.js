@@ -15,9 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (tabs.length === 0) return;
   const tab = tabs[0];
 
-  const blockedProtocols = ['chrome:', 'about:', 'edge:', 'chrome-extension:', 'view-source:'];
-  const isBlocked = !tab.url || blockedProtocols.some(proto => tab.url.startsWith(proto));
-  if (isBlocked) {
+  const urlObj = KoalaClickerModel.parseSiteUrl(tab.url);
+  if (!urlObj) {
     addBtn.disabled = true;
     addBtn.style.opacity = '0.5';
     addBtn.style.cursor = 'not-allowed';
@@ -26,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const urlObj = new URL(tab.url);
   const siteKey = urlObj.origin;
   const legacySiteKey = urlObj.origin + urlObj.pathname;
 
@@ -69,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       await chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ['content/content.js']
+        files: ['shared/model.js', 'content/content.js']
       });
       // Inject native MAIN-world compatibility script (CSP immune)
       try {
@@ -88,10 +86,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadAndRenderClickers() {
     chrome.storage.local.get([siteKey, legacySiteKey], (result) => {
-      const clickers = result[siteKey] || result[legacySiteKey] || [];
+      const storedClickers = result[siteKey] || result[legacySiteKey] || [];
+      const clickers = KoalaClickerModel.normalizeClickers(storedClickers);
 
       if (!result[siteKey] && result[legacySiteKey]) {
-        chrome.storage.local.set({ [siteKey]: result[legacySiteKey] });
+        chrome.storage.local.set({ [siteKey]: clickers }, () => {
+          chrome.storage.local.remove(legacySiteKey);
+        });
+      } else if (JSON.stringify(storedClickers) !== JSON.stringify(clickers)) {
+        chrome.storage.local.set({ [siteKey]: clickers });
       }
       
       if (clickers.length === 0) {
@@ -116,6 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         nameInput.value = clicker.name || 'Clicker ' + (index + 1);
         nameInput.title = `Selector: ${clicker.selector}`;
         nameInput.placeholder = 'Name this clicker';
+        nameInput.maxLength = KoalaClickerModel.MAX_NAME_LENGTH;
 
         const statusBadge = document.createElement('span');
         statusBadge.className = `status-badge ${clicker.active ? '' : 'stopped'}`;
@@ -131,7 +135,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         intervalInput.type = 'number';
         intervalInput.className = 'interval-input';
         intervalInput.value = clicker.interval;
-        intervalInput.min = '25';
+        intervalInput.min = String(KoalaClickerModel.MIN_INTERVAL);
+        intervalInput.max = String(KoalaClickerModel.MAX_INTERVAL);
         intervalInput.step = '25';
 
         const intervalLabel = document.createElement('span');
@@ -166,14 +171,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         intervalInput.addEventListener('input', (e) => {
           let val = parseInt(e.target.value, 10);
-          if (isNaN(val) || val < 25) val = 25;
+          if (isNaN(val) || val < KoalaClickerModel.MIN_INTERVAL) val = KoalaClickerModel.MIN_INTERVAL;
+          if (val > KoalaClickerModel.MAX_INTERVAL) val = KoalaClickerModel.MAX_INTERVAL;
           clicker.interval = val;
           debouncedUpdateSilently(clickers);
         });
 
         intervalInput.addEventListener('change', (e) => {
           let val = parseInt(e.target.value, 10);
-          if (isNaN(val) || val < 25) val = 25;
+          if (isNaN(val) || val < KoalaClickerModel.MIN_INTERVAL) val = KoalaClickerModel.MIN_INTERVAL;
+          if (val > KoalaClickerModel.MAX_INTERVAL) val = KoalaClickerModel.MAX_INTERVAL;
           clicker.interval = val;
           e.target.value = val; // Ensure visual correction
           updateClickersSilently(clickers);
