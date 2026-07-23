@@ -2,6 +2,9 @@
 # https://caddyserver.com
 
 clicker.koalastuff.net {
+    redir /impressum https://koalastuff.net/legal 308
+    redir /impressum.html https://koalastuff.net/legal 308
+
     # Path to the website static files
     root * ./website
     file_server
