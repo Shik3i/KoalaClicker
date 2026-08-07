@@ -58,7 +58,7 @@ test('release packages contain only expected extension files', () => {
       for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
         const entryPath = path.join(directory, entry.name);
         if (entry.isDirectory()) visit(entryPath);
-        else files.push(path.relative(browserDir, entryPath));
+        else files.push(path.relative(browserDir, entryPath).split(path.sep).join('/'));
       }
     };
     visit(browserDir);
