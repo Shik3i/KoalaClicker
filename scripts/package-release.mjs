@@ -9,6 +9,10 @@ if (git("status", "--porcelain", "--untracked-files=no"))
 execFileSync("git", [
   "-c",
   `safe.directory=${process.cwd().replaceAll("\\", "/")}`,
+  "-c",
+  "core.autocrlf=false",
+  "-c",
+  "core.eol=lf",
   "archive",
   "--format=zip",
   `--output=${source}`,

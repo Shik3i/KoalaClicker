@@ -44,7 +44,11 @@ export function validateChecks(checks, commit) {
   }
 }
 export function run(command, args) {
-  return execFileSync(command, args, {
+  const scopedArgs =
+    command === "git"
+      ? ["-c", `safe.directory=${process.cwd().replaceAll("\\", "/")}`, ...args]
+      : args;
+  return execFileSync(command, scopedArgs, {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "inherit"],
   }).trim();

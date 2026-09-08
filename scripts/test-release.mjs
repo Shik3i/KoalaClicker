@@ -77,8 +77,16 @@ test("public instructions and manifests use one release version without obsolete
     "assets/store/listing.md",
   ]) {
     const text = fs.readFileSync(file, "utf8");
-    assert.ok(text.includes("https://koalastuff.net/legal"));
-    assert.ok(!text.includes("koalastuff.net/imprint"));
+    const links = [...text.matchAll(/https:\/\/[^\s"'<>\)]+/g)].map(
+      ([value]) => new URL(value),
+    );
+    assert.ok(links.some((url) => url.href === "https://koalastuff.net/legal"));
+    assert.ok(
+      !links.some(
+        (url) =>
+          url.hostname === "koalastuff.net" && url.pathname === "/imprint",
+      ),
+    );
   }
 });
 

@@ -17,6 +17,7 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: node scripts/audit-dependencies.mjs
+      - run: npm run release:package
   browser:
     runs-on: ubuntu-latest
     strategy:
