@@ -1,4 +1,4 @@
-# KoalaClicker 1.3.0 store package
+# KoalaClicker 1.3.1 store package
 
 **Authoritative submission folder: `assets/store/`.** `store_assets/` is retained only for historical source material.
 

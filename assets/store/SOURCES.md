@@ -1,6 +1,6 @@
 # Image sources and reproduction
 
-Version: 1.3.0.
+Version: 1.3.1.
 
 Existing koala-and-mouse artwork is retained: `icon-master.png`, `icon-source-chroma.png`, `promo-art-master.png` and the repository's `src/assets/Logo_Cut_*.png`. The historical source description identified the master as generated artwork. No new external artwork or remote product screenshots were downloaded for this release.
 

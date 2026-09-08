@@ -1,6 +1,6 @@
 # Manual website and store handoff
 
-Build: `npm ci` then `npm run build:extension`. The verified website is `dist/website/`; durable release archive: `koalaclicker-website-v1.3.0.zip`. Verify published `SHA256SUMS` before extracting.
+Build: `npm ci` then `npm run build:extension`. The verified website is `dist/website/`; durable release archive: `koalaclicker-website-v1.3.1.zip`. Verify published `SHA256SUMS` before extracting.
 
 Only the operator deploys. This repository performs no website upload, hosting configuration, server change or store submission.
 

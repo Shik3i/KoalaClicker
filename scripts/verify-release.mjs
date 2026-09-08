@@ -35,7 +35,7 @@ if (process.argv.includes("--create")) {
       name: `KoalaClicker ${tag}`,
       draft: true,
       prerelease: false,
-      body: "Reliable local storage across tabs, safer stopped target selection, target reselection and stop-all controls. Chrome and Firefox workflow tests, full archive inventories, checksums and provenance. Website deployment and store submission are manual. See README and assets/store for test scope and operator prerequisites.",
+      body: "Security maintenance release: replace vulnerable image-size with pinned image-size-next@2.1.1, remove the parser-disable workaround and audit exceptions, and require zero npm audit findings. ICNS, JXL and HEIF regression tests validate the parser fixes directly. CodeQL now uses a Node.js 24 checkout action. Includes current browser captures, Chrome/Firefox packages, the corrected reviewer source archive, website archive, full inventories, SHA256 checksums and attestations. Website deployment and store submission remain manual.",
     });
   if (release.assets.length)
     throw Error(
@@ -129,6 +129,8 @@ if (process.argv.includes("--publish")) {
       stdio: ["pipe", "ignore", "inherit"],
     },
   );
+  release = api(`repos/${repo}/releases/${release.id}`);
+  if (release.draft) throw Error("Release publication was not confirmed.");
 }
 console.log(
   `Verified ${release.draft ? "draft" : "published"} release ${release.id}: ${release.html_url}\nDownloads: ${download}`,

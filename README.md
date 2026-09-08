@@ -1,6 +1,6 @@
 # KoalaClicker
 
-Current build: v1.3.0
+Current build: v1.3.1
 
 Repeat synthetic mouse clicks on selected elements in a web page. Configure up to 50 targets per website, with independent names and intervals from 25 to 86,400,000 milliseconds.
 
@@ -23,10 +23,10 @@ Closing the popup leaves clicks running. Navigation, reload and history restorat
 
 ## Install locally
 
-Download [v1.3.0](https://github.com/Shik3i/KoalaClicker/releases/tag/v1.3.0).
+Download [v1.3.1](https://github.com/Shik3i/KoalaClicker/releases/tag/v1.3.1).
 
-- Chrome: extract `koalaclicker-chrome-v1.3.0.zip`, open `chrome://extensions`, enable Developer mode, choose Load unpacked.
-- Firefox: extract `koalaclicker-firefox-v1.3.0.zip`, open `about:debugging#/runtime/this-firefox`, Load Temporary Add-on, choose `manifest.json`. Unsigned temporary installations end when Firefox restarts. Permanent distribution requires Mozilla signing.
+- Chrome: extract `koalaclicker-chrome-v1.3.1.zip`, open `chrome://extensions`, enable Developer mode, choose Load unpacked.
+- Firefox: extract `koalaclicker-firefox-v1.3.1.zip`, open `about:debugging#/runtime/this-firefox`, Load Temporary Add-on, choose `manifest.json`. Unsigned temporary installations end when Firefox restarts. Permanent distribution requires Mozilla signing.
 
 Official store installation/rating links are withheld until real listings are available.
 
@@ -45,7 +45,7 @@ npm run test:website
 
 `dist/chrome/`, `dist/firefox/`, `dist/website/` and their versioned ZIPs are the local builds. Browser executable overrides: `KOALACLICKER_CHROME`, `KOALACLICKER_FIREFOX`.
 
-The current lockfile replaces the linter's vulnerable `image-size@2.0.2` with the separately maintained [`image-size-next@2.1.1`](https://github.com/lcf2212dev/image-size-next/compare/v2.0.2...v2.1.1), pinned by an npm override and integrity hash. Parser regressions run directly with hard process timeouts; no formats are disabled and the audit gate accepts no advisory exceptions. The immutable v1.3.0 source archive predates this tooling correction and retains its original parser guard.
+The lockfile replaces the linter's vulnerable `image-size@2.0.2` with the separately maintained [`image-size-next@2.1.1`](https://github.com/lcf2212dev/image-size-next/compare/v2.0.2...v2.1.1), pinned by an npm override and integrity hash. Parser regressions run directly with hard process timeouts; no formats are disabled and the audit gate accepts no advisory exceptions. The release source archive includes this corrected tooling.
 
 The Firefox browser test uses a disposable copy with a popup-tab bootstrap and an all-URLs grant required by Firefox tab screenshots. The isolated profile contains only repository fixtures and extension pages. Production permissions remain `activeTab`, `storage`, `scripting`. That harness does not prove physical toolbar activation. Chrome invokes the extension action through its browser protocol; popup controls use DOM events and page selection uses browser pointer input.
 

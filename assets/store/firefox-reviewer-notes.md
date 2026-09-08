@@ -1,4 +1,4 @@
-# Firefox reviewer notes — 1.3.0
+# Firefox reviewer notes — 1.3.1
 
 Single purpose: repeat synthetic mouse clicks on elements the user selects in an invoked top-level page. No account, credentials, remote code or extension network client.
 
@@ -34,4 +34,4 @@ Earlier window-capture listeners belonging to the page can still observe selecti
 
 Automated Firefox tests use a disposable fixture profile, an extension-owned popup tab, and a test-only all-URLs grant required for real tab screenshots. This is not a claim of physical toolbar/shortcut activation. Production permission restrictions are separately asserted in package checks; do not submit `build/` harness files. Physical Android, other OS/window-manager and arbitrary-website behavior are not inferred from these tests.
 
-Current development tooling replaces the linter's `image-size@2.0.2` with the separately maintained `image-size-next@2.1.1` through an exact npm override. Its ICNS/JXL/HEIF parser fixes are tested directly, without disabling formats; `npm audit` rejects every reported vulnerability. The published v1.3.0 reviewer archive retains its original tooling and parser guard. No npm dependency is included in the submitted extension.
+Development tooling replaces the linter's `image-size@2.0.2` with the separately maintained `image-size-next@2.1.1` through an exact npm override. Its ICNS/JXL/HEIF parser fixes are tested directly, without disabling formats; `npm audit` rejects every reported vulnerability. The release reviewer archive includes the corrected tooling. No npm dependency is included in the submitted extension.

@@ -1,6 +1,6 @@
 # Manual submission checklist
 
-Release version: 1.3.0. The repository's release checks validate the GitHub artifacts; store approval and public website deployment remain separate.
+Release version: 1.3.1. The repository's release checks validate the GitHub artifacts; store approval and public website deployment remain separate.
 
 - [ ] Confirm final store developer identity/contact and account security in the actual dashboards.
 - [ ] Confirm hosting, logged fields, processing location and full deletion schedule; finalize the pending operator paragraphs before deploying the website privacy page.

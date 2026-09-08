@@ -1,4 +1,4 @@
-# Using KoalaClicker 1.3.0
+# Using KoalaClicker 1.3.1
 
 1. Install the browser-specific package as described in README.md. Open an ordinary HTTP/HTTPS page.
 2. Invoke the toolbar icon or configured shortcut (`Alt+Shift+K`; macOS: `MacCtrl+Shift+K`). Browser shortcut settings may override it.
