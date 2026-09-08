@@ -2,7 +2,7 @@
 
 1. Install the browser-specific package as described in README.md. Open an ordinary HTTP/HTTPS page.
 2. Invoke the toolbar icon or configured shortcut (`Alt+Shift+K`; macOS: `MacCtrl+Shift+K`). Browser shortcut settings may override it.
-3. Choose Add New Clicker. Select a regular visible element in the main document. Escape or Cancel exits selection. The target is saved stopped.
+3. Choose Add New Clicker. Select a regular visible element in the main document. Escape or Cancel exits selection. The target is saved stopped. The next 500 ms of page mouse input are consumed to prevent an accidental second click; reopening the popup ends this guard.
 4. Reopen the popup. Choose a name and an interval of 25–86,400,000 whole milliseconds. Press Start. Stop or Stop all ends clicks; closing the popup does not.
 5. Select target again replaces a target and stops it. Delete removes it; Delete all clears this website after confirmation.
 

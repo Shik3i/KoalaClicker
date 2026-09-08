@@ -123,6 +123,9 @@ try {
   await p.waitForFunction(() => !document.querySelector(".clicker-item"));
   await select(p);
   await garden.click("#flower");
+  await garden.click("#flower", { clickCount: 2 });
+  assert.equal(await garden.evaluate(() => count), 1);
+  passed("selection double-click does not activate the target");
   p = await popup();
   await p.waitForSelector(".clicker-item");
   await p.$eval(".clicker-name-input", (e) => {
@@ -295,6 +298,46 @@ try {
   await garden.waitForFunction("count>" + effects);
   assert.ok((await garden.evaluate(() => count)) > effects);
   passed("DOM replacement resolves a fresh element");
+  await garden.evaluate(() => {
+    const rect = document.querySelector("#flower").getBoundingClientRect();
+    const cover = document.createElement("div");
+    cover.id = "test-overlay";
+    cover.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;z-index:100;background:black`;
+    document.body.append(cover);
+  });
+  effects = await garden.evaluate(() => count);
+  await delay(200);
+  assert.equal(await garden.evaluate(() => count), effects);
+  await garden.evaluate(() => {
+    document.querySelector("#test-overlay").remove();
+    document.querySelector("#flower").style.transform = "translateY(2000px)";
+  });
+  await delay(200);
+  assert.equal(await garden.evaluate(() => count), effects);
+  await garden.evaluate(() => {
+    const button = document.querySelector("#flower");
+    button.style.transform = "";
+    button.parentElement.append(button.cloneNode(true));
+  });
+  await delay(200);
+  assert.equal(await garden.evaluate(() => count), effects);
+  await garden.evaluate(() => document.querySelectorAll("#flower")[1].remove());
+  passed("covered, offscreen and newly ambiguous targets are skipped");
+  await p.close();
+  const foreign = await browser.newPage();
+  await foreign.goto(url.replace("127.0.0.1", "localhost"));
+  p = await popup(foreign);
+  assert.equal(await p.$eval("#empty-state", (e) => e.hidden), false);
+  await mutate(p, "clear");
+  effects = await garden.evaluate(() => count);
+  await garden.waitForFunction("count>" + effects, { polling: 100 });
+  assert.equal(await foreign.evaluate(() => count), 0);
+  await p.close();
+  await foreign.close();
+  p = await popup();
+  passed(
+    "different origins have separate settings and cannot stop existing timers",
+  );
   await mutate(p, "stopAll");
   await mutate(p, "clear");
   for (let index = 0; index < 50; index++)
@@ -328,6 +371,27 @@ try {
   });
   await p.close();
   await garden.waitForFunction(() => count > 1);
+  await garden.evaluate(() => {
+    addEventListener("pageshow", (event) => {
+      window.restoredFromCache = event.persisted;
+    });
+  });
+  await garden.goto(url + "history-away");
+  await garden.goBack({ waitUntil: "load" });
+  effects = await garden.evaluate(() => count);
+  await delay(300);
+  assert.equal(await garden.evaluate(() => count), effects);
+  const restored = await garden.evaluate(
+    () => window.restoredFromCache === true,
+  );
+  passed(`history back leaves timers stopped (BFCache restored: ${restored})`);
+  await garden.goForward({ waitUntil: "load" });
+  assert.equal(await garden.evaluate(() => count), 0);
+  await garden.goBack({ waitUntil: "load" });
+  p = await popup();
+  await p.close();
+  effects = await garden.evaluate(() => count);
+  await garden.waitForFunction("count>" + effects);
   await browser.uninstallExtension(id);
   effects = await garden.evaluate(() => count);
   await delay(200);

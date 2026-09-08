@@ -26,6 +26,19 @@ export function validateSource({ tag, type, commit, main, version }) {
     throw new Error("Package version does not match release tag");
 }
 export function validateChecks(checks, commit) {
+  const security = checks
+    .filter(
+      (check) =>
+        check.head_sha === commit &&
+        check.name === "CodeQL" &&
+        check.app?.slug === "github-advanced-security",
+    )
+    .sort((a, b) => b.id - a.id)[0];
+  if (
+    security &&
+    (security.status !== "completed" || security.conclusion !== "success")
+  )
+    throw new Error("CodeQL security result is not successful");
   for (const name of requiredChecks) {
     const check = checks
       .filter(

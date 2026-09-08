@@ -6,6 +6,7 @@
     "real action activation with unchanged production permissions and empty state",
     "selection Escape restores page interaction",
     "selection suppresses pointer/mouse handlers and link navigation; saves stopped",
+    "selection double-click does not activate the target",
     "input followed by immediate popup closure persists",
     "start produces actual target-page effects",
     "stop-all clears active timers",
@@ -19,7 +20,10 @@
     "hidden and disabled targets are skipped",
     "missing target status is visible",
     "DOM replacement resolves a fresh element",
+    "covered, offscreen and newly ambiguous targets are skipped",
+    "different origins have separate settings and cannot stop existing timers",
     "50 targets remain scrollable with labelled inputs and disabled add",
+    "history back leaves timers stopped (BFCache restored: true)",
     "extension uninstall invalidates running content timers"
   ]
 }

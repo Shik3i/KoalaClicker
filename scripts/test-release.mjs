@@ -39,6 +39,22 @@ test("release eligibility rejects lightweight tags, mismatched versions/commits 
   assert.throws(() => validateChecks(checks.slice(1), commit));
   assert.throws(() =>
     validateChecks(
+      [
+        ...checks,
+        {
+          id: 100,
+          name: "CodeQL",
+          head_sha: commit,
+          app: { slug: "github-advanced-security" },
+          status: "completed",
+          conclusion: "failure",
+        },
+      ],
+      commit,
+    ),
+  );
+  assert.throws(() =>
+    validateChecks(
       [...checks, { ...checks[0], id: 100, conclusion: "failure" }],
       commit,
     ),

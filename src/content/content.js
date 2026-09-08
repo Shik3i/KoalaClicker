@@ -10,6 +10,8 @@
   let clickers = [];
   let selection = null;
   let hovered = null;
+  let suppressUntil = 0;
+  let releaseSelectionEvents;
   const timers = new Map();
   const status = new Map();
   const host = document.createElement("div");
@@ -35,21 +37,27 @@
     if (hovered) hovered.classList.remove("koala-clicker-highlight");
     hovered = null;
   }
-  function exitSelection() {
+  function exitSelection(protectClickSequence = false) {
     selection = null;
     banner.style.display = "none";
     unhighlight();
-    for (const type of [
-      "pointerdown",
-      "pointerup",
-      "mousedown",
-      "mouseup",
-      "click",
-      "dblclick",
-      "auxclick",
-      "contextmenu",
-    ])
-      window.removeEventListener(type, intercept, true);
+    clearTimeout(releaseSelectionEvents);
+    suppressUntil = protectClickSequence ? performance.now() + 500 : 0;
+    const release = () => {
+      for (const type of [
+        "pointerdown",
+        "pointerup",
+        "mousedown",
+        "mouseup",
+        "click",
+        "dblclick",
+        "auxclick",
+        "contextmenu",
+      ])
+        window.removeEventListener(type, intercept, true);
+    };
+    if (protectClickSequence) releaseSelectionEvents = setTimeout(release, 500);
+    else release();
     window.removeEventListener("mouseover", highlight, true);
     window.removeEventListener("keydown", escape, true);
   }
@@ -124,7 +132,14 @@
     banner.style.display = "block";
   }
   async function intercept(event) {
-    if (!selection || event.composedPath().includes(host)) return;
+    if (event.composedPath().includes(host)) return;
+    if (!selection) {
+      if (event.isTrusted && performance.now() < suppressUntil) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+      return;
+    }
     event.preventDefault();
     event.stopImmediatePropagation();
     if (event.type !== "click") return;
@@ -133,7 +148,7 @@
       if (!validDocument())
         throw new Error("The page changed. Reopen KoalaClicker.");
       const selector = selectorFor(event.composedPath()[0]);
-      exitSelection();
+      exitSelection(true);
       const result = await api.runtime.sendMessage({
         action: "STORE",
         op: selected.id ? "patch" : "add",
@@ -149,7 +164,7 @@
       sync(result);
       notice("Target saved, stopped. Open KoalaClicker to start it.");
     } catch (error) {
-      exitSelection();
+      exitSelection(true);
       notice(error.message);
     }
   }
@@ -263,6 +278,7 @@
       return false;
     }
     if (message.action === "INIT") {
+      exitSelection();
       enabled = true;
       revision = -1;
       api.runtime.sendMessage({ action: "STORE", op: "get", url: route }).then(
