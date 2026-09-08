@@ -6,7 +6,7 @@
   "scripts": {
     "build:extension": "node scripts/build-extension.cjs",
     "test": "node --test --test-concurrency=1 scripts/test-*.mjs",
-    "lint:firefox": "node --require ./scripts/linter-safe-images.cjs node_modules/addons-linter/bin/addons-linter dist/firefox --output text",
+    "lint:firefox": "addons-linter dist/firefox --output text",
     "check": "npm run build:extension && npm test && npm run lint:firefox",
     "test:browser:chrome": "node scripts/browser-flow.mjs",
     "test:browser:firefox": "node scripts/browser-firefox.mjs && node scripts/browser-firefox.mjs --denial",
@@ -22,7 +22,8 @@
     "yauzl": "3.4.0"
   },
   "overrides": {
-    "glob": "13.0.6"
+    "glob": "13.0.6",
+    "image-size": "npm:image-size-next@2.1.1"
   },
   "engines": {
     "node": ">=22.12.0"

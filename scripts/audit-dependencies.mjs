@@ -1,8 +1,10 @@
 import { spawnSync } from "node:child_process";
 const result = spawnSync(
-  process.platform === "win32" ? "npm.cmd" : "npm",
-  ["audit", "--json"],
-  { encoding: "utf8", shell: process.platform === "win32" },
+  process.platform === "win32" ? process.env.ComSpec || "cmd.exe" : "npm",
+  process.platform === "win32"
+    ? ["/d", "/s", "/c", "npm audit --json"]
+    : ["audit", "--json"],
+  { encoding: "utf8", timeout: 60000 },
 );
 if (result.error) throw result.error;
 let report;
@@ -12,25 +14,14 @@ try {
   throw Error(result.stderr || "npm audit did not return JSON");
 }
 if (report.error) throw Error(JSON.stringify(report.error));
-const expected = new Set([
-  "https://github.com/advisories/GHSA-w3rx-r6r6-pgpr",
-  "https://github.com/advisories/GHSA-5p2g-fcmc-qvqq",
-]);
-for (const [name, value] of Object.entries(report.vulnerabilities || {})) {
-  if (
-    !["image-size", "addons-linter"].includes(name) ||
-    (!value.isDirect && name !== "image-size")
-  )
-    throw Error(`Unreviewed vulnerable dependency: ${name}`);
-  for (const via of value.via) {
-    if (typeof via === "string") {
-      if (via !== "image-size") throw Error(`Unreviewed chain: ${via}`);
-    } else if (!expected.has(via.url))
-      throw Error(`Unreviewed advisory: ${via.url}`);
-  }
-}
-console.log(JSON.stringify(report.metadata.vulnerabilities));
-if (Object.keys(report.vulnerabilities || {}).length)
-  console.log(
-    "Known development-only image-size parser advisories remain upstream. Firefox lint preloads disabled ICNS/JXL/HEIF parsers; regression tests enforce rejection. No dependencies are shipped in extension packages.",
+if (
+  result.status !== 0 ||
+  report.metadata?.vulnerabilities?.total !== 0 ||
+  Object.keys(report.vulnerabilities || {}).length
+)
+  throw Error(
+    `npm audit failed: ${JSON.stringify(report.vulnerabilities || report)}`,
   );
+console.log(
+  "npm audit: 0 vulnerabilities (all severities; no advisory exceptions).",
+);
