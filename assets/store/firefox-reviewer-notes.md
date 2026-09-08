@@ -1,35 +1,37 @@
-# Firefox Reviewer Notes
+# Firefox reviewer notes — 1.3.0
 
-KoalaClicker has one purpose: the user selects an element in the active tab and
-the extension dispatches synthetic mouse clicks at the configured interval.
+Single purpose: repeat synthetic mouse clicks on elements the user selects in an invoked top-level page. No account, credentials, remote code or extension network client.
 
-## Test procedure
+## Reproduce
 
-1. Open any ordinary HTTPS page containing a button.
-2. Open KoalaClicker and select `Add New Clicker`.
-3. Select the button on the page.
-4. Reopen the popup and verify the clicker is listed and running.
-5. Change the interval, stop and restart the clicker, then delete it.
-6. Reload the page, reopen KoalaClicker, and verify locally saved state resumes.
+Node.js 22.12+ and npm:
 
-No account or test credentials are required. The extension transmits no data.
-It uses only `activeTab`, `storage`, and `scripting`; it has no host permissions.
-
-The packaged MAIN-world compatibility helper is limited to
-`orteil.dashnet.org`. Immediately before a user-configured click on that host,
-it resets Cookie Clicker's local `Game.lastClick` timing field. The helper is
-inactive on all other hosts.
-
-## Reproducing the package
-
-Requirements: Node.js 22 and npm.
-
-```bash
+```sh
 npm ci
 npm run check
-npm run build:extension -- --version=1.2.10
+npm run test:browser:chrome
+npm run test:browser:firefox
+npm run test:website
 ```
 
-The unminified source is copied directly into `dist/firefox`; the build changes
-only the browser-specific manifest and creates the ZIP. No runtime third-party
-libraries are included.
+Source files are readable and copied into `dist/chrome` / `dist/firefox`. Firefox's manifest replaces the Chrome service worker declaration with an event background script list and adds Mozilla identifiers/minimum versions/data declaration. The version is already committed before the release tag; the build cannot override it.
+
+The reviewer source ZIP contains the exact release commit. Browser ZIPs contain no tests, harness permissions or npm libraries. `SHA256SUMS`, `INVENTORY.json`, `PROVENANCE.json` and GitHub attestations identify the released artifacts.
+
+## Manual browser steps
+
+1. Load the production Firefox package temporarily from `about:debugging#/runtime/this-firefox`. The unsigned package is temporary until Mozilla signing.
+2. Open the repository fixture `tests/fixtures/garden.html` via a local HTTP server, or a regular HTTPS page with a non-destructive button. Invoke the toolbar icon (or configured shortcut).
+3. Choose Add New Clicker. Escape cancels. Repeat selection and choose a button: the target is saved **stopped** without invoking its ordinary link/form action.
+4. Reopen, rename, set 250 ms and press Start. Observe the page's counter. Stop, resume, select a replacement target and delete it.
+5. Add two targets, press Stop all, reopen another tab on the same origin and verify shared settings. A new tab needs its own invocation before page code runs.
+6. Start a target, reload or navigate, and observe that clicks stop. Reopen to restore configured active targets. Close the popup while running and observe that clicks continue.
+7. Hidden, disabled, covered, offscreen, missing or ambiguous targets are skipped. Frames, Shadow DOM and canvas contents are unsupported.
+
+Earlier window-capture listeners belonging to the page can still observe selection input. Synthetic events never become trusted hardware events. Website rules and browser throttling apply. The old Cookie Clicker MAIN-world clock adjustment is removed; no Game object is modified.
+
+`activeTab`, `scripting`, `storage` are the only production permissions. The background script performs ordered local storage operations; content documents run click timers. Firefox declares `data_collection_permissions.required: ["none"]` because the extension does not collect/transmit data outside the browser. Local origins/selectors/names/settings are nevertheless processed. Target-page actions and independently opened links have separate network effects.
+
+Automated Firefox tests use a disposable fixture profile, an extension-owned popup tab, and a test-only all-URLs grant required for real tab screenshots. This is not a claim of physical toolbar/shortcut activation. Production permission restrictions are separately asserted in package checks; do not submit `build/` harness files. Physical Android, other OS/window-manager and arbitrary-website behavior are not inferred from these tests.
+
+Development-only `image-size@2.0.2` advisories remain without an upstream release. Firefox lint preloads a guard disabling unused vulnerable ICNS/JXL/HEIF parsers; a malformed-ICNS regression and normal PNG validation run in the checks. No npm dependency is included in the submitted extension.

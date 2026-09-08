@@ -1,19 +1,30 @@
 {
   "name": "koalaclicker",
-  "version": "1.2.10",
+  "version": "1.3.0",
   "description": "KoalaClicker release build tooling",
   "private": true,
   "scripts": {
     "build:extension": "node scripts/build-extension.cjs",
-    "test": "node --test scripts/test-extension.mjs",
-    "lint:firefox": "addons-linter dist/firefox --output text",
-    "check": "npm run build:extension && npm test && npm run lint:firefox"
+    "test": "node --test --test-concurrency=1 scripts/test-*.mjs",
+    "lint:firefox": "node --require ./scripts/linter-safe-images.cjs node_modules/addons-linter/bin/addons-linter dist/firefox --output text",
+    "check": "npm run build:extension && npm test && npm run lint:firefox",
+    "test:browser:chrome": "node scripts/browser-flow.mjs",
+    "test:browser:firefox": "node scripts/browser-firefox.mjs && node scripts/browser-firefox.mjs --denial",
+    "test:website": "node scripts/website-check.mjs",
+    "release:package": "node scripts/package-release.mjs",
+    "release:verify": "node scripts/verify-release.mjs"
   },
   "devDependencies": {
-    "addons-linter": "10.9.0",
-    "archiver": "^7.0.1"
+    "addons-linter": "10.10.0",
+    "archiver": "^7.0.1",
+    "prettier": "3.9.6",
+    "puppeteer-core": "25.10.0",
+    "yauzl": "3.4.0"
   },
   "overrides": {
     "glob": "13.0.6"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

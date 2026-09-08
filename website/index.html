@@ -1,602 +1,775 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KoalaClicker — Privacy-First Auto-Clicker for Idle Games</title>
-  <meta name="description" content="KoalaClicker is a modern, privacy-first browser extension auto-clicker for idle games and repetitive web tasks. Zero tracking, zero dependencies, 100% local.">
-  <meta property="og:title" content="KoalaClicker — Click Smarter. Play Longer.">
-  <meta property="og:description" content="Privacy-first auto-clicker for idle games. Up to 50 parallel clickers, 25ms minimum interval, zero tracking.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://clicker.koalastuff.net">
-  <meta name="theme-color" content="#1e1e2e">
-  <meta name="koalaclicker-version" content="1.2.10">
-  <link rel="canonical" href="https://clicker.koalastuff.net">
-  <link rel="icon" type="image/png" href="assets/Logo_Cut_128.png?v=1.2.10">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KoalaClicker — Privacy-First Auto-Clicker for Idle Games</title>
+    <meta
+      name="description"
+      content="Set repeat clicks on selected page elements. Local settings, adjustable intervals, and controls for up to 50 targets per website."
+    />
+    <meta
+      property="og:title"
+      content="KoalaClicker — Repeat clicks, with controls"
+    />
+    <meta
+      property="og:description"
+      content="Privacy-first auto-clicker for idle games. Up to 50 parallel clickers, 25ms minimum interval, zero tracking."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://clicker.koalastuff.net" />
+    <meta name="theme-color" content="#1e1e2e" />
+    <meta name="koalaclicker-version" content="1.3.0" />
+    <link rel="canonical" href="https://clicker.koalastuff.net" />
+    <link rel="icon" type="image/png" href="assets/Logo_Cut_128.png?v=1.3.0" />
+    <link rel="stylesheet" href="style.css" />
 
-  <!-- Animated background blobs -->
-  <div class="bg-blobs" aria-hidden="true">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-  </div>
-
-  <!-- ===================== NAV ===================== -->
-  <nav class="nav" id="nav">
-    <div class="nav-inner">
-      <a href="/" class="nav-brand" aria-label="KoalaClicker Home">
-        <img src="assets/Logo_Cut_128.png?v=1.2.10"
-             alt="KoalaClicker Logo" class="nav-logo" width="32" height="32">
-        <span class="nav-brand-text">KoalaClicker</span>
-      </a>
-
-      <ul class="nav-links" id="nav-links" role="list">
-        <li><a href="#features" class="nav-link"><span lang="en">Features</span><span lang="de">Funktionen</span></a></li>
-        <li><a href="#how-it-works" class="nav-link"><span lang="en">How it works</span><span lang="de">So funktioniert's</span></a></li>
-        <li>
-          <a href="https://github.com/Shik3i/KoalaClicker" target="_blank" rel="noopener noreferrer"
-             class="nav-link nav-github-link" aria-label="GitHub Repository">
-            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
-            GitHub
-          </a>
-        </li>
-        <li>
-          <button class="lang-toggle nav-link" aria-label="Auf Deutsch wechseln">🌐 DE</button>
-        </li>
-      </ul>
-
-      <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-      </button>
+    <meta
+      property="og:image"
+      content="https://clicker.koalastuff.net/assets/social-preview.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <!-- Animated background blobs -->
+    <div class="bg-blobs" aria-hidden="true">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
     </div>
-  </nav>
 
-  <!-- ===================== HERO ===================== -->
-  <section class="hero" id="home">
-    <div class="hero-inner">
-      <div class="hero-content">
-        <div class="version-badge" data-reveal>
-          <span class="version-dot"></span>
-          <span lang="en"><span data-koalaclicker-version></span> &middot; Available on GitHub</span>
-          <span lang="de"><span data-koalaclicker-version></span> &middot; Auf GitHub verfügbar</span>
-        </div>
+    <!-- ===================== NAV ===================== -->
+    <nav class="nav" id="nav">
+      <div class="nav-inner">
+        <a href="/" class="nav-brand" aria-label="KoalaClicker Home">
+          <img
+            src="assets/Logo_Cut_128.png?v=1.3.0"
+            alt="KoalaClicker Logo"
+            class="nav-logo"
+            width="32"
+            height="32"
+          />
+          <span class="nav-brand-text">KoalaClicker</span>
+        </a>
 
-        <h1 class="hero-title" data-reveal>
-          <span lang="en">
-            <span class="gradient-text">Click Smarter.</span><br>
-            <span class="gradient-text-alt">Play Longer.</span>
-          </span>
-          <span lang="de">
-            <span class="gradient-text">Schlauer klicken.</span><br>
-            <span class="gradient-text-alt">Länger spielen.</span>
-          </span>
-        </h1>
-
-        <p class="hero-subtitle" data-reveal>
-          <span lang="en">The privacy-first auto-clicker browser extension for idle games and repetitive web tasks. Zero tracking. Zero telemetry. Runs 100% locally on your device.</span>
-          <span lang="de">Die Privatsphäre-freundliche Auto-Clicker-Erweiterung für Idle-Games und repetitive Aufgaben. Kein Tracking. Keine Telemetrie. Läuft zu 100% lokal auf deinem Gerät.</span>
-        </p>
-
-        <div class="hero-ctas" data-reveal>
-          <a href="https://github.com/Shik3i/KoalaClicker/releases/latest"
-             target="_blank" rel="noopener noreferrer"
-             class="btn btn-primary">
-            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <circle cx="12" cy="12" r="4"/>
-              <line x1="21.17" y1="8" x2="12" y2="8"/>
-              <line x1="3.95" y1="6.06" x2="8.54" y2="14"/>
-              <line x1="10.88" y1="21.94" x2="15.46" y2="14"/>
-            </svg>
-            <span lang="en">Download Chrome ZIP</span>
-            <span lang="de">Chrome-ZIP laden</span>
-          </a>
-          <a href="https://github.com/Shik3i/KoalaClicker/releases/latest"
-             target="_blank" rel="noopener noreferrer"
-             class="btn btn-secondary btn-firefox-hero">
-            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8.824 7.287c.008 0 .004 0 0 0zm-2.8-1.4c.006 0 .003 0 0 0zm16.754 2.161c-.505-1.215-1.53-2.528-2.333-2.943.654 1.283 1.033 2.57 1.177 3.53l.002.02c-1.314-3.278-3.544-4.6-5.366-7.477-.091-.147-.184-.292-.273-.446a3.545 3.545 0 01-.13-.24 2.118 2.118 0 01-.172-.46.03.03 0 00-.027-.03.038.038 0 00-.021 0l-.006.001a.037.037 0 00-.01.005L15.624 0c-2.585 1.515-3.657 4.168-3.932 5.856a6.197 6.197 0 00-2.305.587.297.297 0 00-.147.37c.057.162.24.24.396.17a5.622 5.622 0 012.008-.523l.067-.005a5.847 5.847 0 011.957.222l.095.03a5.816 5.816 0 01.616.228c.08.036.16.073.238.112l.107.055a5.835 5.835 0 01.368.211 5.953 5.953 0 012.034 2.104c-.62-.437-1.733-.868-2.803-.681 4.183 2.09 3.06 9.292-2.737 9.02a5.164 5.164 0 01-1.513-.292 4.42 4.42 0 01-.538-.232c-1.42-.735-2.593-2.121-2.74-3.806 0 0 .537-2 3.845-2 .357 0 1.38-.998 1.398-1.287-.005-.095-2.029-.9-2.817-1.677-.422-.416-.622-.616-.8-.767a3.47 3.47 0 00-.301-.227 5.388 5.388 0 01-.032-2.842c-1.195.544-2.124 1.403-2.8 2.163h-.006c-.46-.584-.428-2.51-.402-2.913-.006-.025-.343.176-.389.206-.406.29-.787.616-1.136.974-.397.403-.76.839-1.085 1.303a9.816 9.816 0 00-1.562 3.52c-.003.013-.11.487-.19 1.073-.013.09-.026.181-.037.272a7.8 7.8 0 00-.069.667l-.002.034-.023.387-.001.06C.386 18.795 5.593 24 12.016 24c5.752 0 10.527-4.176 11.463-9.661.02-.149.035-.298.052-.448.232-1.994-.025-4.09-.753-5.844z"/>
-            </svg>
-            <span lang="en">Download Firefox ZIP</span>
-            <span lang="de">Firefox-ZIP laden</span>
-          </a>
-          <a href="https://github.com/Shik3i/KoalaClicker/releases"
-             target="_blank" rel="noopener noreferrer"
-             class="btn btn-ghost">
-            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
-            <span lang="en">GitHub</span>
-            <span lang="de">GitHub</span>
-          </a>
-        </div>
-
-        <div class="hero-stats" data-reveal>
-          <div class="stat">
-            <span class="stat-value">50</span>
-            <span class="stat-label">
-              <span lang="en">Parallel Clickers</span>
-              <span lang="de">Parallele Clicker</span>
-            </span>
-          </div>
-          <div class="stat-divider" aria-hidden="true"></div>
-          <div class="stat">
-            <span class="stat-value">25ms</span>
-            <span class="stat-label">
-              <span lang="en">Min Interval</span>
-              <span lang="de">Min. Intervall</span>
-            </span>
-          </div>
-          <div class="stat-divider" aria-hidden="true"></div>
-          <div class="stat">
-            <span class="stat-value">0</span>
-            <span class="stat-label">
-              <span lang="en">Data Sent</span>
-              <span lang="de">Gesendete Daten</span>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Interactive popup mockup -->
-      <div class="hero-mockup" data-reveal aria-label="KoalaClicker popup interface preview">
-        <div class="mockup-browser-bar">
-          <span class="mockup-dot mockup-dot-red"></span>
-          <span class="mockup-dot mockup-dot-yellow"></span>
-          <span class="mockup-dot mockup-dot-green"></span>
-          <span class="mockup-url-bar">orteil.dashnet.org/cookieclicker</span>
-          <div class="mockup-ext-icon" title="KoalaClicker active">
-            <img src="assets/Logo_Cut_128.png?v=1.2.10"
-                 alt="KoalaClicker icon" width="16" height="16">
-          </div>
-        </div>
-
-        <div class="popup-mockup">
-          <!-- Popup Header -->
-          <div class="pm-header">
-            <div class="pm-header-title">
-              <img src="assets/Logo_Cut_128.png?v=1.2.10"
-                   alt="" width="22" height="22" aria-hidden="true">
-              <span class="pm-title">KoalaClicker</span>
-            </div>
-            <div class="pm-version-badge">
-              <svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        <ul class="nav-links" id="nav-links" role="list">
+          <li>
+            <a href="#features" class="nav-link"
+              ><span lang="en">Features</span
+              ><span lang="de">Funktionen</span></a
+            >
+          </li>
+          <li>
+            <a href="#how-it-works" class="nav-link"
+              ><span lang="en">How it works</span
+              ><span lang="de">So funktioniert's</span></a
+            >
+          </li>
+          <li>
+            <a
+              href="https://github.com/Shik3i/KoalaClicker"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="nav-link nav-github-link"
+              aria-label="GitHub Repository"
+            >
+              <svg
+                aria-hidden="true"
+                width="18"
+                height="18"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                ></path>
               </svg>
-              <span data-koalaclicker-version></span>
-            </div>
-          </div>
-
-          <!-- Add New Clicker Button -->
-          <div class="pm-actions">
-            <button class="pm-add-btn" tabindex="-1">
-              <span lang="en"><span>+</span> Add New Clicker</span>
-              <span lang="de"><span>+</span> Neuen Clicker hinzufügen</span>
+              GitHub
+            </a>
+          </li>
+          <li>
+            <button
+              class="lang-toggle nav-link"
+              aria-label="Auf Deutsch wechseln"
+            >
+              🌐 DE
             </button>
+          </li>
+        </ul>
+
+        <button
+          class="hamburger"
+          id="hamburger"
+          aria-label="Toggle navigation"
+          aria-expanded="false"
+        >
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===================== HERO ===================== -->
+    <section class="hero" id="home">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <div class="version-badge" data-reveal="">
+            <span class="version-dot"></span>
+            <span lang="en"
+              ><span data-koalaclicker-version=""></span> · Available on
+              GitHub</span
+            >
+            <span lang="de"
+              ><span data-koalaclicker-version=""></span> · Auf GitHub
+              verfügbar</span
+            >
           </div>
 
-          <!-- Clicker Cards -->
-          <div class="pm-clickers">
-            <!-- Card 1: Running -->
-            <div class="pm-card pm-card-running">
-              <div class="pm-card-header">
-                <input class="pm-name-input" lang="en" value="🍪 Big Cookie" readonly tabindex="-1">
-                <input class="pm-name-input" lang="de" value="🍪 Riesen-Keks" readonly tabindex="-1">
-                <span class="pm-badge pm-badge-running">
-                  <span lang="en">Running</span>
-                  <span lang="de">Aktiv</span>
-                </span>
-              </div>
-              <div class="pm-card-controls">
-                <input class="pm-interval-input" value="100" readonly tabindex="-1">
-                <span class="pm-interval-label">ms</span>
-                <button class="pm-btn pm-btn-stop pm-btn-running" tabindex="-1">
-                  <span lang="en">Stop</span>
-                  <span lang="de">Stopp</span>
-                </button>
-                <button class="pm-btn pm-btn-delete" tabindex="-1">🗑</button>
-              </div>
-            </div>
+          <h1 class="hero-title" data-reveal="">
+            <span lang="en">
+              <span class="gradient-text">Click Smarter.</span><br />
+              <span class="gradient-text-alt">Play Longer.</span>
+            </span>
+            <span lang="de">
+              <span class="gradient-text">Schlauer klicken.</span><br />
+              <span class="gradient-text-alt">Länger spielen.</span>
+            </span>
+          </h1>
 
-            <!-- Card 2: Stopped -->
-            <div class="pm-card">
-              <div class="pm-card-header">
-                <input class="pm-name-input" lang="en" value="⚡ Golden Cookie" readonly tabindex="-1">
-                <input class="pm-name-input" lang="de" value="⚡ Goldener Keks" readonly tabindex="-1">
-                <span class="pm-badge pm-badge-stopped">
-                  <span lang="en">Stopped</span>
-                  <span lang="de">Gestoppt</span>
-                </span>
-              </div>
-              <div class="pm-card-controls">
-                <input class="pm-interval-input" value="250" readonly tabindex="-1">
-                <span class="pm-interval-label">ms</span>
-                <button class="pm-btn pm-btn-start" tabindex="-1">Start</button>
-                <button class="pm-btn pm-btn-delete" tabindex="-1">🗑</button>
-              </div>
+          <p class="hero-subtitle" data-reveal="">
+            <span lang="en"
+              >Repeat clicks on selected page elements for idle games and
+              repetitive tasks. Settings stay in local extension storage. Target
+              pages can react to clicks with their own requests.</span
+            >
+            <span lang="de"
+              >Wiederhole Klicks auf ausgewählte Seitenelemente für Idle-Games
+              und wiederkehrende Aufgaben. Einstellungen bleiben im lokalen
+              Extension-Speicher. Zielseiten können durch Klicks eigene Anfragen
+              auslösen.</span
+            >
+          </p>
+
+          <div class="hero-ctas" data-reveal="">
+            <a
+              href="https://github.com/Shik3i/KoalaClicker/releases/tag/v1.3.0"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-primary"
+            >
+              <svg
+                aria-hidden="true"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="4"></circle>
+                <line x1="21.17" y1="8" x2="12" y2="8"></line>
+                <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
+                <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
+              </svg>
+              <span lang="en">Download Chrome ZIP</span>
+              <span lang="de">Chrome-ZIP laden</span>
+            </a>
+            <a
+              href="https://github.com/Shik3i/KoalaClicker/releases/tag/v1.3.0"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-secondary btn-firefox-hero"
+            >
+              <svg
+                aria-hidden="true"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M8.824 7.287c.008 0 .004 0 0 0zm-2.8-1.4c.006 0 .003 0 0 0zm16.754 2.161c-.505-1.215-1.53-2.528-2.333-2.943.654 1.283 1.033 2.57 1.177 3.53l.002.02c-1.314-3.278-3.544-4.6-5.366-7.477-.091-.147-.184-.292-.273-.446a3.545 3.545 0 01-.13-.24 2.118 2.118 0 01-.172-.46.03.03 0 00-.027-.03.038.038 0 00-.021 0l-.006.001a.037.037 0 00-.01.005L15.624 0c-2.585 1.515-3.657 4.168-3.932 5.856a6.197 6.197 0 00-2.305.587.297.297 0 00-.147.37c.057.162.24.24.396.17a5.622 5.622 0 012.008-.523l.067-.005a5.847 5.847 0 011.957.222l.095.03a5.816 5.816 0 01.616.228c.08.036.16.073.238.112l.107.055a5.835 5.835 0 01.368.211 5.953 5.953 0 012.034 2.104c-.62-.437-1.733-.868-2.803-.681 4.183 2.09 3.06 9.292-2.737 9.02a5.164 5.164 0 01-1.513-.292 4.42 4.42 0 01-.538-.232c-1.42-.735-2.593-2.121-2.74-3.806 0 0 .537-2 3.845-2 .357 0 1.38-.998 1.398-1.287-.005-.095-2.029-.9-2.817-1.677-.422-.416-.622-.616-.8-.767a3.47 3.47 0 00-.301-.227 5.388 5.388 0 01-.032-2.842c-1.195.544-2.124 1.403-2.8 2.163h-.006c-.46-.584-.428-2.51-.402-2.913-.006-.025-.343.176-.389.206-.406.29-.787.616-1.136.974-.397.403-.76.839-1.085 1.303a9.816 9.816 0 00-1.562 3.52c-.003.013-.11.487-.19 1.073-.013.09-.026.181-.037.272a7.8 7.8 0 00-.069.667l-.002.034-.023.387-.001.06C.386 18.795 5.593 24 12.016 24c5.752 0 10.527-4.176 11.463-9.661.02-.149.035-.298.052-.448.232-1.994-.025-4.09-.753-5.844z"
+                ></path>
+              </svg>
+              <span lang="en">Download Firefox ZIP</span>
+              <span lang="de">Firefox-ZIP laden</span>
+            </a>
+            <a
+              href="https://github.com/Shik3i/KoalaClicker/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-ghost"
+            >
+              <svg
+                aria-hidden="true"
+                width="18"
+                height="18"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                ></path>
+              </svg>
+              <span lang="en">GitHub</span>
+              <span lang="de">GitHub</span>
+            </a>
+          </div>
+
+          <div class="hero-stats" data-reveal="">
+            <div class="stat">
+              <span class="stat-value">50</span>
+              <span class="stat-label">
+                <span lang="en">Parallel Clickers</span>
+                <span lang="de">Parallele Clicker</span>
+              </span>
+            </div>
+            <div class="stat-divider" aria-hidden="true"></div>
+            <div class="stat">
+              <span class="stat-value">25ms</span>
+              <span class="stat-label">
+                <span lang="en">Min Interval</span>
+                <span lang="de">Min. Intervall</span>
+              </span>
+            </div>
+            <div class="stat-divider" aria-hidden="true"></div>
+            <div class="stat">
+              <span class="stat-value">0</span>
+              <span class="stat-label">
+                <span lang="en">Data Sent</span>
+                <span lang="de">Gesendete Daten</span>
+              </span>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ===================== FEATURES ===================== -->
-  <section class="features" id="features">
-    <div class="container">
-      <div class="section-header" data-reveal>
-        <span class="section-label">
-          <span lang="en">Features</span>
-          <span lang="de">Funktionen</span>
-        </span>
-        <h2 class="section-title">
-          <span lang="en">Everything you need. Nothing you don't.</span>
-          <span lang="de">Alles was du brauchst. Sonst nichts.</span>
-        </h2>
-        <p class="section-subtitle">
-          <span lang="en">Built with a single principle: your data stays on your device, always.</span>
-          <span lang="de">Entwickelt nach einem klaren Prinzip: Deine Daten gehören dir und bleiben lokal.</span>
-        </p>
-      </div>
-
-      <div class="features-grid">
-        <article class="feature-card" data-reveal>
-          <div class="feature-icon-wrap">
-            <span class="feature-icon" aria-hidden="true">🔒</span>
-          </div>
-          <h3 class="feature-title">
-            <span lang="en">Privacy First</span>
-            <span lang="de">Privatsphäre zuerst</span>
-          </h3>
-          <p class="feature-desc">
-            <span lang="en">Uses <code>activeTab</code> only — zero access to any page until <em>you</em> click the extension icon. No background access, no tracking, no telemetry. 100% ad-free.</span>
-            <span lang="de">Nutzt nur <code>activeTab</code> — kein Zugriff auf Webseiten, bis <em>du</em> auf das Symbol klickst. Keine Hintergrund-Rechte, kein Tracking, 100% werbefrei.</span>
-          </p>
-        </article>
-
-        <article class="feature-card" data-reveal>
-          <div class="feature-icon-wrap">
-            <span class="feature-icon" aria-hidden="true">🎯</span>
-          </div>
-          <h3 class="feature-title">
-            <span lang="en">Multiple Clickers</span>
-            <span lang="de">Mehrere Clicker</span>
-          </h3>
-          <p class="feature-desc">
-            <span lang="en">Add up to <strong>50 parallel clickers</strong> per website, each with its own label, interval, and target element. Perfect for complex idle games.</span>
-            <span lang="de">Füge bis zu <strong>50 parallele Clicker</strong> pro Webseite hinzu, jeder mit eigenem Namen, Intervall und Element. Perfekt für komplexe Idle-Games.</span>
-          </p>
-        </article>
-
-        <article class="feature-card" data-reveal>
-          <div class="feature-icon-wrap">
-            <span class="feature-icon" aria-hidden="true">⚡</span>
-          </div>
-          <h3 class="feature-title">
-            <span lang="en">Ultra-Fast Clicking</span>
-            <span lang="de">Extrem schnelles Klicken</span>
-          </h3>
-          <p class="feature-desc">
-            <span lang="en">Minimum interval of <strong>25ms</strong> — that's 40 clicks per second. On the official Cookie Clicker host, a packaged helper adjusts its local click timing immediately before configured clicks.</span>
-            <span lang="de">Mindestintervall von <strong>25 ms</strong> — das sind 40 Klicks pro Sekunde. Auf dem offiziellen Cookie-Clicker-Host passt ein mitgelieferter Helfer unmittelbar vor konfigurierten Klicks dessen lokales Klick-Timing an.</span>
-          </p>
-        </article>
-
-        <article class="feature-card" data-reveal>
-          <div class="feature-icon-wrap">
-            <span class="feature-icon" aria-hidden="true">👁</span>
-          </div>
-          <h3 class="feature-title">
-            <span lang="en">Live Highlighting</span>
-            <span lang="de">Live-Hervorhebung</span>
-          </h3>
-          <p class="feature-desc">
-            <span lang="en">Hover over any clicker card in the popup and the corresponding element on the page instantly <strong>glows pink</strong> — so you always know exactly what's being clicked.</span>
-            <span lang="de">Bewege die Maus über eine Clicker-Karte und das Element auf der Seite leuchtet <strong>pink auf</strong> — so weißt du immer genau, was angeklickt wird.</span>
-          </p>
-        </article>
-
-        <article class="feature-card" data-reveal>
-          <div class="feature-icon-wrap">
-            <span class="feature-icon" aria-hidden="true">💾</span>
-          </div>
-          <h3 class="feature-title">
-            <span lang="en">State Resumption</span>
-            <span lang="de">Speichern & Laden</span>
-          </h3>
-          <p class="feature-desc">
-            <span lang="en">Clicker configurations persist per website via <code>chrome.storage.local</code>. After a page reload, open the popup once and your active clickers resume.</span>
-            <span lang="de">Deine Clicker werden pro Website über <code>chrome.storage.local</code> gespeichert. Nach einem Neuladen öffnest du das Popup einmal und aktive Clicker laufen weiter.</span>
-          </p>
-        </article>
-
-        <article class="feature-card" data-reveal>
-          <div class="feature-icon-wrap">
-            <span class="feature-icon" aria-hidden="true">🌐</span>
-          </div>
-          <h3 class="feature-title">
-            <span lang="en">Cross-Browser</span>
-            <span lang="de">Browser-übergreifend</span>
-          </h3>
-          <p class="feature-desc">
-            <span lang="en">Works seamlessly on <strong>Chrome, Firefox, Edge, Brave</strong>, and any Chromium-based browser. Manifest V3 compliant. GitHub Actions builds both Chrome and Firefox ZIPs automatically.</span>
-            <span lang="de">Läuft problemlos auf <strong>Chrome, Firefox, Edge, Brave</strong> und allen Chromium-Browsern. Manifest V3 konform. GitHub Actions baut Chrome- und Firefox-ZIPs vollautomatisch.</span>
-          </p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== HOW IT WORKS ===================== -->
-  <section class="how-it-works" id="how-it-works">
-    <div class="container">
-      <div class="section-header" data-reveal>
-        <span class="section-label">
-          <span lang="en">How it works</span>
-          <span lang="de">So funktioniert's</span>
-        </span>
-        <h2 class="section-title">
-          <span lang="en">Up and running in 3 steps.</span>
-          <span lang="de">In 3 Schritten startklar.</span>
-        </h2>
-        <p class="section-subtitle">
-          <span lang="en">No configuration files, no accounts, no cloud. Just install and click.</span>
-          <span lang="de">Keine Konfigurationsdateien, keine Accounts, keine Cloud. Einfach installieren und loslegen.</span>
-        </p>
-      </div>
-
-      <!-- Step 1 -->
-      <div class="step step-odd" data-reveal>
-        <div class="step-content">
-          <div class="step-number" aria-label="Step 1">01</div>
-          <h3 class="step-title">
-            <span lang="en">Install the Extension</span>
-            <span lang="de">Erweiterung installieren</span>
-          </h3>
-          <p class="step-desc">
-            <span lang="en">Grab the latest <code>.zip</code> from GitHub Releases while the Chrome Web Store listing is being prepared. For Chrome/Edge/Brave, enable <em>Developer mode</em> and hit <strong>Load unpacked</strong>. For Firefox, load via <code>about:debugging</code>.</span>
-            <span lang="de">Lade während der Vorbereitung des Chrome-Web-Store-Eintrags die aktuelle <code>.zip</code> aus den GitHub-Releases. Aktiviere für Chrome/Edge/Brave den <em>Entwicklermodus</em> und klicke auf <strong>"Entpackte Erweiterung laden"</strong>. Für Firefox nutze <code>about:debugging</code>.</span>
-          </p>
-          <a href="https://github.com/Shik3i/KoalaClicker/releases/latest"
-             target="_blank" rel="noopener noreferrer"
-             class="step-link">
-            <span lang="en">Download Latest Release &rarr;</span>
-            <span lang="de">Neuestes Release herunterladen &rarr;</span>
-          </a>
-        </div>
-        <div class="step-visual" aria-hidden="true">
-          <div class="visual-install">
-            <div class="vi-browser-bar">
-              <div class="vi-dots">
-                <span></span><span></span><span></span>
-              </div>
-              <div class="vi-url">chrome://extensions</div>
+        <!-- Interactive popup mockup -->
+        <div
+          class="hero-mockup"
+          data-reveal=""
+          aria-label="KoalaClicker popup interface preview"
+        >
+          <div class="mockup-browser-bar">
+            <span class="mockup-dot mockup-dot-red"></span>
+            <span class="mockup-dot mockup-dot-yellow"></span>
+            <span class="mockup-dot mockup-dot-green"></span>
+            <span class="mockup-url-bar">Local demo · Click garden</span>
+            <div class="mockup-ext-icon" title="KoalaClicker active">
+              <img
+                src="assets/Logo_Cut_128.png?v=1.3.0"
+                alt="KoalaClicker icon"
+                width="16"
+                height="16"
+              />
             </div>
-            <div class="vi-body">
-              <div class="vi-row vi-row-header">
-                <span>Extensions</span>
-                <div class="vi-toggle-wrap">
-                  <span class="vi-toggle-label">
-                    <span lang="en">Developer mode</span>
-                    <span lang="de">Entwicklermodus</span>
-                  </span>
-                  <div class="vi-toggle vi-toggle-on"></div>
+          </div>
+
+          <figure class="product-shot">
+            <img
+              src="assets/popup-running.png"
+              alt="KoalaClicker 1.3.0 popup with a running clicker"
+            />
+            <figcaption>
+              <span lang="en">Actual Chrome popup · local demo</span
+              ><span lang="de">Echtes Chrome-Popup · lokale Demo</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FEATURES ===================== -->
+    <section class="features" id="features">
+      <div class="container">
+        <div class="section-header" data-reveal="">
+          <span class="section-label">
+            <span lang="en">Features</span>
+            <span lang="de">Funktionen</span>
+          </span>
+          <h2 class="section-title">
+            <span lang="en">Everything you need. Nothing you don't.</span>
+            <span lang="de">Alles was du brauchst. Sonst nichts.</span>
+          </h2>
+          <p class="section-subtitle">
+            <span lang="en"
+              >Local settings. Clear controls for each target.</span
+            >
+            <span lang="de"
+              >Lokale Einstellungen. Klare Bedienelemente für jedes Ziel.</span
+            >
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card" data-reveal="">
+            <div class="feature-icon-wrap">
+              <span class="feature-icon" aria-hidden="true">🔒</span>
+            </div>
+            <h3 class="feature-title">
+              <span lang="en">Privacy First</span>
+              <span lang="de">Privatsphäre zuerst</span>
+            </h3>
+            <p class="feature-desc">
+              <span lang="en"
+                >Page access begins when you invoke the extension by its icon or
+                shortcut. The extension also uses storage and scripting. It
+                includes no telemetry or advertising.</span
+              >
+              <span lang="de"
+                >Seitenzugriff beginnt mit deinem Aufruf per Symbol oder
+                Tastenkürzel. Die Erweiterung nutzt zusätzlich storage und
+                scripting. Ohne Telemetrie oder Werbung.</span
+              >
+            </p>
+          </article>
+
+          <article class="feature-card" data-reveal="">
+            <div class="feature-icon-wrap">
+              <span class="feature-icon" aria-hidden="true">🎯</span>
+            </div>
+            <h3 class="feature-title">
+              <span lang="en">Multiple Clickers</span>
+              <span lang="de">Mehrere Clicker</span>
+            </h3>
+            <p class="feature-desc">
+              <span lang="en"
+                >Add up to <strong>50 parallel clickers</strong> per website,
+                each with its own label, interval, and target element. Perfect
+                for complex idle games.</span
+              >
+              <span lang="de"
+                >Füge bis zu <strong>50 parallele Clicker</strong> pro Webseite
+                hinzu, jeder mit eigenem Namen, Intervall und Element. Perfekt
+                für komplexe Idle-Games.</span
+              >
+            </p>
+          </article>
+
+          <article class="feature-card" data-reveal="">
+            <div class="feature-icon-wrap">
+              <span class="feature-icon" aria-hidden="true">⚡</span>
+            </div>
+            <h3 class="feature-title">
+              <span lang="en">Adjustable timing</span>
+              <span lang="de">Einstellbares Intervall</span>
+            </h3>
+            <p class="feature-desc">
+              <span lang="en"
+                >Choose 25 to 86,400,000 ms. Browser throttling, suspended tabs
+                and website rules can reduce the actual click rate. There is no
+                catch-up burst after sleep.</span
+              >
+              <span lang="de"
+                >Wähle 25 bis 86.400.000 ms. Browser-Drosselung, pausierte Tabs
+                und Regeln der Zielseite können die tatsächliche Klickrate
+                senken. Nach Standby werden keine Klicks nachgeholt.</span
+              >
+            </p>
+          </article>
+
+          <article class="feature-card" data-reveal="">
+            <div class="feature-icon-wrap">
+              <span class="feature-icon" aria-hidden="true">👁</span>
+            </div>
+            <h3 class="feature-title">
+              <span lang="en">Live Highlighting</span>
+              <span lang="de">Live-Hervorhebung</span>
+            </h3>
+            <p class="feature-desc">
+              <span lang="en"
+                >Selection highlights the target. Save it stopped, then start
+                when ready. Change targets or stop all clickers for this website
+                from the popup.</span
+              >
+              <span lang="de"
+                >Die Auswahl hebt dein Ziel hervor. Es wird gestoppt
+                gespeichert. Starte es bewusst, wähle ein neues Ziel oder stoppe
+                alle Clicker dieser Website im Popup.</span
+              >
+            </p>
+          </article>
+
+          <article class="feature-card" data-reveal="">
+            <div class="feature-icon-wrap">
+              <span class="feature-icon" aria-hidden="true">💾</span>
+            </div>
+            <h3 class="feature-title">
+              <span lang="en">State Resumption</span>
+              <span lang="de">Speichern &amp; Laden</span>
+            </h3>
+            <p class="feature-desc">
+              <span lang="en"
+                >Clicker configurations persist per website via
+                <code>chrome.storage.local</code>. After a page reload, open the
+                popup once and your active clickers resume.</span
+              >
+              <span lang="de"
+                >Deine Clicker werden pro Website über
+                <code>chrome.storage.local</code> gespeichert. Nach einem
+                Neuladen öffnest du das Popup einmal und aktive Clicker laufen
+                weiter.</span
+              >
+            </p>
+          </article>
+
+          <article class="feature-card" data-reveal="">
+            <div class="feature-icon-wrap">
+              <span class="feature-icon" aria-hidden="true">🌐</span>
+            </div>
+            <h3 class="feature-title">
+              <span lang="en">Cross-Browser</span>
+              <span lang="de">Browser-übergreifend</span>
+            </h3>
+            <p class="feature-desc">
+              <span lang="en"
+                >Separate Chrome and Firefox packages. Desktop workflow tests
+                cover both browsers. Other Chromium browsers and Android devices
+                need their own acceptance checks.</span
+              >
+              <span lang="de"
+                >Separate Pakete für Chrome und Firefox. Desktop-Abläufe werden
+                in beiden Browsern getestet. Andere Chromium-Browser und
+                Android-Geräte benötigen eine eigene Abnahme.</span
+              >
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section class="how-it-works" id="how-it-works">
+      <div class="container">
+        <div class="section-header" data-reveal="">
+          <span class="section-label">
+            <span lang="en">How it works</span>
+            <span lang="de">So funktioniert's</span>
+          </span>
+          <h2 class="section-title">
+            <span lang="en">Up and running in 3 steps.</span>
+            <span lang="de">In 3 Schritten startklar.</span>
+          </h2>
+          <p class="section-subtitle">
+            <span lang="en"
+              >No configuration files, no accounts, no cloud. Just install and
+              click.</span
+            >
+            <span lang="de"
+              >Keine Konfigurationsdateien, keine Accounts, keine Cloud. Einfach
+              installieren und loslegen.</span
+            >
+          </p>
+          <p class="section-subtitle">
+            <span lang="en"
+              >Targets start stopped. Reopen the popup and press Start.
+              Synthetic clicks may be rejected by a site. Frames, Shadow DOM and
+              canvas contents are not supported; hidden, covered, ambiguous and
+              disabled targets are skipped.</span
+            ><span lang="de"
+              >Neue Ziele sind gestoppt. Öffne das Popup und drücke Start.
+              Seiten können synthetische Klicks ablehnen. Frames, Shadow DOM und
+              Canvas-Inhalte werden nicht unterstützt; unsichtbare, verdeckte,
+              mehrdeutige und deaktivierte Ziele werden übersprungen.</span
+            >
+          </p>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="step step-odd" data-reveal="">
+          <div class="step-content">
+            <div class="step-number" aria-label="Step 1">01</div>
+            <h3 class="step-title">
+              <span lang="en">Install the Extension</span>
+              <span lang="de">Erweiterung installieren</span>
+            </h3>
+            <p class="step-desc">
+              <span lang="en"
+                >Grab the latest <code>.zip</code> from GitHub Releases while
+                the Chrome Web Store listing is being prepared. For
+                Chrome/Edge/Brave, enable <em>Developer mode</em> and hit
+                <strong>Load unpacked</strong>. For Firefox, load via
+                <code>about:debugging</code>.</span
+              >
+              <span lang="de"
+                >Lade während der Vorbereitung des Chrome-Web-Store-Eintrags die
+                aktuelle <code>.zip</code> aus den GitHub-Releases. Aktiviere
+                für Chrome/Edge/Brave den <em>Entwicklermodus</em> und klicke
+                auf <strong>"Entpackte Erweiterung laden"</strong>. Für Firefox
+                nutze <code>about:debugging</code>.</span
+              >
+            </p>
+            <a
+              href="https://github.com/Shik3i/KoalaClicker/releases/tag/v1.3.0"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="step-link"
+            >
+              <span lang="en">Download Latest Release →</span>
+              <span lang="de">Neuestes Release herunterladen →</span>
+            </a>
+          </div>
+          <div class="step-visual" aria-hidden="true">
+            <div class="visual-install">
+              <div class="vi-browser-bar">
+                <div class="vi-dots">
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="vi-url">chrome://extensions</div>
+              </div>
+              <div class="vi-body">
+                <div class="vi-row vi-row-header">
+                  <span>Extensions</span>
+                  <div class="vi-toggle-wrap">
+                    <span class="vi-toggle-label">
+                      <span lang="en">Developer mode</span>
+                      <span lang="de">Entwicklermodus</span>
+                    </span>
+                    <div class="vi-toggle vi-toggle-on"></div>
+                  </div>
+                </div>
+                <div class="vi-btn-row">
+                  <div class="vi-chip vi-chip-active">
+                    <span lang="en">Load unpacked</span>
+                    <span lang="de">Entpackte laden</span>
+                  </div>
+                  <div class="vi-chip">
+                    <span lang="en">Pack extension</span>
+                    <span lang="de">Erweiterung packen</span>
+                  </div>
+                </div>
+                <div class="vi-ext-card">
+                  <img
+                    src="assets/Logo_Cut_128.png?v=1.3.0"
+                    alt=""
+                    width="32"
+                    height="32"
+                  />
+                  <div class="vi-ext-info">
+                    <span class="vi-ext-name">KoalaClicker</span>
+                    <span class="vi-ext-desc">
+                      <span lang="en">Privacy-first auto-clicker</span>
+                      <span lang="de">Privatsphäre Auto-Clicker</span>
+                    </span>
+                  </div>
+                  <div class="vi-ext-toggle vi-toggle-on"></div>
                 </div>
               </div>
-              <div class="vi-btn-row">
-                <div class="vi-chip vi-chip-active">
-                  <span lang="en">Load unpacked</span>
-                  <span lang="de">Entpackte laden</span>
-                </div>
-                <div class="vi-chip">
-                  <span lang="en">Pack extension</span>
-                  <span lang="de">Erweiterung packen</span>
-                </div>
-              </div>
-              <div class="vi-ext-card">
-                <img src="assets/Logo_Cut_128.png?v=1.2.10"
-                     alt="" width="32" height="32">
-                <div class="vi-ext-info">
-                  <span class="vi-ext-name">KoalaClicker</span>
-                  <span class="vi-ext-desc">
-                    <span lang="en">Privacy-first auto-clicker</span>
-                    <span lang="de">Privatsphäre Auto-Clicker</span>
-                  </span>
-                </div>
-                <div class="vi-ext-toggle vi-toggle-on"></div>
-              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Step 2 -->
-      <div class="step step-even" data-reveal>
-        <div class="step-visual" aria-hidden="true">
-          <div class="vs-page">
-            <div class="vs-banner">
-              <span class="vs-banner-dot"></span>
-              <span lang="en">🎯 Hover over an element and click to select it</span>
-              <span lang="de">🎯 Maus über ein Element bewegen und klicken</span>
-            </div>
-            <div class="vs-game-ui">
-              <div class="vs-cookie-wrap">
-                <div class="vs-cookie vs-cookie-highlight">
-                  <span>🍪</span>
-                </div>
-                <div class="vs-highlight-ring"></div>
+        <!-- Step 2 -->
+        <div class="step step-even" data-reveal="">
+          <div class="step-visual" aria-hidden="true">
+            <div class="vs-page">
+              <div class="vs-banner">
+                <span class="vs-banner-dot"></span>
+                <span lang="en"
+                  >🎯 Hover over an element and click to select it</span
+                >
+                <span lang="de"
+                  >🎯 Maus über ein Element bewegen und klicken</span
+                >
               </div>
-              <div class="vs-sidebar">
-                <div class="vs-item vs-item-1">
-                  <span lang="en">🏭 Cursor ×1</span>
-                  <span lang="de">🏭 Zeiger ×1</span>
+              <div class="vs-game-ui">
+                <div class="vs-cookie-wrap">
+                  <div class="vs-cookie vs-cookie-highlight">
+                    <span>🍪</span>
+                  </div>
+                  <div class="vs-highlight-ring"></div>
                 </div>
-                <div class="vs-item vs-item-2">
-                  <span lang="en">🏠 Grandma ×3</span>
-                  <span lang="de">🏠 Oma ×3</span>
-                </div>
-                <div class="vs-item vs-item-3">
-                  <span lang="en">🌾 Farm ×1</span>
-                  <span lang="de">🌾 Farm ×1</span>
+                <div class="vs-sidebar">
+                  <div class="vs-item vs-item-1">
+                    <span lang="en">🏭 Cursor ×1</span>
+                    <span lang="de">🏭 Zeiger ×1</span>
+                  </div>
+                  <div class="vs-item vs-item-2">
+                    <span lang="en">🏠 Grandma ×3</span>
+                    <span lang="de">🏠 Oma ×3</span>
+                  </div>
+                  <div class="vs-item vs-item-3">
+                    <span lang="en">🌾 Farm ×1</span>
+                    <span lang="de">🌾 Farm ×1</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          <div class="step-content">
+            <div class="step-number" aria-label="Step 2">02</div>
+            <h3 class="step-title">
+              <span lang="en">Select an Element</span>
+              <span lang="de">Element auswählen</span>
+            </h3>
+            <p class="step-desc">
+              <span lang="en"
+                >Navigate to your game. Click the KoalaClicker icon in the
+                toolbar, then press <strong>"Add New Clicker"</strong>. The
+                popup closes and Element Selection Mode activates — a banner
+                appears on the page.</span
+              >
+              <span lang="de"
+                >Gehe auf deine Spiel-Seite. Klicke auf das KoalaClicker-Symbol
+                in der Symbolleiste, dann auf
+                <strong>"Add New Clicker"</strong>. Das Popup schließt sich und
+                der Auswahlmodus startet — ein Banner erscheint.</span
+              >
+            </p>
+            <p class="step-desc">
+              <span lang="en"
+                >Hover over any element to see it
+                <span class="text-pink">glow pink</span>, then click to register
+                it as a clicker target.</span
+              >
+              <span lang="de"
+                >Bewege die Maus über ein Element, bis es
+                <span class="text-pink">pink leuchtet</span>, und klicke darauf,
+                um es als Klick-Ziel zu speichern.</span
+              >
+            </p>
+          </div>
         </div>
-        <div class="step-content">
-          <div class="step-number" aria-label="Step 2">02</div>
-          <h3 class="step-title">
-            <span lang="en">Select an Element</span>
-            <span lang="de">Element auswählen</span>
-          </h3>
-          <p class="step-desc">
-            <span lang="en">Navigate to your game. Click the KoalaClicker icon in the toolbar, then press <strong>"Add New Clicker"</strong>. The popup closes and Element Selection Mode activates — a banner appears on the page.</span>
-            <span lang="de">Gehe auf deine Spiel-Seite. Klicke auf das KoalaClicker-Symbol in der Symbolleiste, dann auf <strong>"Add New Clicker"</strong>. Das Popup schließt sich und der Auswahlmodus startet — ein Banner erscheint.</span>
-          </p>
-          <p class="step-desc">
-            <span lang="en">Hover over any element to see it <span class="text-pink">glow pink</span>, then click to register it as a clicker target.</span>
-            <span lang="de">Bewege die Maus über ein Element, bis es <span class="text-pink">pink leuchtet</span>, und klicke darauf, um es als Klick-Ziel zu speichern.</span>
-          </p>
-        </div>
-      </div>
 
-      <!-- Step 3 -->
-      <div class="step step-odd" data-reveal>
-        <div class="step-content">
-          <div class="step-number" aria-label="Step 3">03</div>
-          <h3 class="step-title">
-            <span lang="en">Click Automatically</span>
-            <span lang="de">Automatisch klicken</span>
-          </h3>
-          <p class="step-desc">
-            <span lang="en">New clickers start immediately. Adjust the interval, rename the clicker, toggle individual ones on or off — all in real time. Hover a card and the corresponding element lights up on the page.</span>
-            <span lang="de">Neue Clicker starten sofort. Passe das Intervall an, benenne sie um, schalte sie an oder aus — alles in Echtzeit. Fahre über eine Karte, um das Element auf der Seite zu sehen.</span>
-          </p>
-          <p class="step-desc">
-            <span lang="en">All settings save automatically per website. After a page reload, open the popup once and active clickers resume.</span>
-            <span lang="de">Alle Einstellungen werden pro Website automatisch gespeichert. Nach einem Neuladen öffnest du das Popup einmal und aktive Clicker laufen weiter.</span>
-          </p>
-        </div>
-        <div class="step-visual" aria-hidden="true">
-          <div class="visual-popup">
-            <div class="vp-header">
-              <div class="vp-header-left">
-                <img src="assets/Logo_Cut_128.png?v=1.2.10"
-                     alt="" width="20" height="20">
-                <span>KoalaClicker</span>
-              </div>
-              <span class="vp-version" data-koalaclicker-version></span>
-            </div>
-            <div class="vp-add-btn">
-              <span lang="en">+ Add New Clicker</span>
-              <span lang="de">+ Neuen Clicker hinzufügen</span>
-            </div>
-            <div class="vp-card vp-card-active">
-              <div class="vp-card-row">
-                <span class="vp-name">
-                  <span lang="en">🍪 Big Cookie</span>
-                  <span lang="de">🍪 Riesen-Keks</span>
-                </span>
-                <span class="vp-badge vp-badge-run">
-                  <span lang="en">Running</span>
-                  <span lang="de">Aktiv</span>
-                </span>
-              </div>
-              <div class="vp-card-row vp-card-controls">
-                <span class="vp-interval">100</span>
-                <span class="vp-ms">ms</span>
-                <span class="vp-stop-btn">
-                  <span lang="en">Stop</span>
-                  <span lang="de">Stopp</span>
-                </span>
-                <span class="vp-del">🗑</span>
-              </div>
-            </div>
-            <div class="vp-card">
-              <div class="vp-card-row">
-                <span class="vp-name">
-                  <span lang="en">⚡ Golden Cookie</span>
-                  <span lang="de">⚡ Goldener Keks</span>
-                </span>
-                <span class="vp-badge vp-badge-stop">
-                  <span lang="en">Stopped</span>
-                  <span lang="de">Gestoppt</span>
-                </span>
-              </div>
-              <div class="vp-card-row vp-card-controls">
-                <span class="vp-interval">250</span>
-                <span class="vp-ms">ms</span>
-                <span class="vp-start-btn">Start</span>
-                <span class="vp-del">🗑</span>
-              </div>
-            </div>
+        <!-- Step 3 -->
+        <div class="step step-odd" data-reveal="">
+          <div class="step-content">
+            <div class="step-number" aria-label="Step 3">03</div>
+            <h3 class="step-title">
+              <span lang="en">Click Automatically</span>
+              <span lang="de">Automatisch klicken</span>
+            </h3>
+            <p class="step-desc">
+              <span lang="en"
+                >New targets are saved stopped. Reopen the popup, choose an
+                interval and press Start. Use Stop all for this website or
+                select a target again.</span
+              >
+              <span lang="de"
+                >Neue Ziele werden gestoppt gespeichert. Öffne das Popup, wähle
+                ein Intervall und drücke Start. Mit Stop all stoppst du diese
+                Website; das Ziel kannst du erneut auswählen.</span
+              >
+            </p>
+            <p class="step-desc">
+              <span lang="en"
+                >All settings save automatically per website. After a page
+                reload, open the popup once and active clickers resume.</span
+              >
+              <span lang="de"
+                >Alle Einstellungen werden pro Website automatisch gespeichert.
+                Nach einem Neuladen öffnest du das Popup einmal und aktive
+                Clicker laufen weiter.</span
+              >
+            </p>
+          </div>
+          <div class="step-visual" aria-hidden="true">
+            <img
+              class="actual-popup"
+              src="assets/popup-stopped.png"
+              alt="KoalaClicker popup with a stopped target"
+            />
           </div>
         </div>
       </div>
+    </section>
 
-    </div>
-  </section>
-
-  <!-- ===================== CTA ===================== -->
-  <section class="cta-section" id="cta">
-    <div class="container">
-      <div class="cta-box" data-reveal>
-        <div class="cta-glow" aria-hidden="true"></div>
-        <h2 class="cta-title">
-          <span lang="en">Start clicking smarter today.</span>
-          <span lang="de">Klicke noch heute schlauer.</span>
-        </h2>
-        <p class="cta-subtitle">
-          <span lang="en">Free. Open source. Privacy-first. No account required.</span>
-          <span lang="de">Kostenlos. Open Source. Privatsphäre-freundlich. Kein Account nötig.</span>
-        </p>
-        <div class="cta-buttons">
-          <a href="https://github.com/Shik3i/KoalaClicker"
-             target="_blank" rel="noopener noreferrer"
-             class="btn btn-primary btn-lg">
-            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
-            <span lang="en">View on GitHub</span>
-            <span lang="de">Auf GitHub ansehen</span>
-          </a>
-          <a href="https://github.com/Shik3i/KoalaClicker/blob/main/README.md"
-             target="_blank" rel="noopener noreferrer"
-             class="btn btn-ghost">
-            <span lang="en">Read the Docs</span>
-            <span lang="de">Dokumentation lesen</span>
-          </a>
+    <!-- ===================== CTA ===================== -->
+    <section class="cta-section" id="cta">
+      <div class="container">
+        <div class="cta-box" data-reveal="">
+          <div class="cta-glow" aria-hidden="true"></div>
+          <h2 class="cta-title">
+            <span lang="en">Start clicking smarter today.</span>
+            <span lang="de">Klicke noch heute schlauer.</span>
+          </h2>
+          <p class="cta-subtitle">
+            <span lang="en"
+              >Free. Open source. Privacy-first. No account required.</span
+            >
+            <span lang="de"
+              >Kostenlos. Open Source. Privatsphäre-freundlich. Kein Account
+              nötig.</span
+            >
+          </p>
+          <div class="cta-buttons">
+            <a
+              href="https://github.com/Shik3i/KoalaClicker"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-primary btn-lg"
+            >
+              <svg
+                aria-hidden="true"
+                width="18"
+                height="18"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                ></path>
+              </svg>
+              <span lang="en">View on GitHub</span>
+              <span lang="de">Auf GitHub ansehen</span>
+            </a>
+            <a
+              href="https://github.com/Shik3i/KoalaClicker/blob/main/README.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-ghost"
+            >
+              <span lang="en">Read the Docs</span>
+              <span lang="de">Dokumentation lesen</span>
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ===================== FOOTER ===================== -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-brand">
-          <img src="assets/Logo_Cut_128.png?v=1.2.10"
-               alt="KoalaClicker Logo" width="28" height="28">
-          <span class="footer-name">KoalaClicker</span>
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-inner">
+          <div class="footer-brand">
+            <img
+              src="assets/Logo_Cut_128.png?v=1.3.0"
+              alt="KoalaClicker Logo"
+              width="28"
+              height="28"
+            />
+            <span class="footer-name">KoalaClicker</span>
+          </div>
+          <p class="footer-copy">© 2026 KoalaClicker · MIT License</p>
+          <nav class="footer-links" aria-label="Footer navigation">
+            <a
+              href="https://github.com/Shik3i/KoalaClicker"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="footer-link"
+              >GitHub</a
+            >
+            <a href="https://koalastuff.net/legal" class="footer-link"
+              ><span lang="en">Legal Notice</span
+              ><span lang="de">Impressum</span></a
+            >
+            <a href="datenschutz.html" class="footer-link"
+              ><span lang="en">Privacy Policy</span
+              ><span lang="de">Datenschutz</span></a
+            >
+            <a
+              class="footer-link"
+              href="https://github.com/Shik3i/KoalaClicker/issues"
+              >Support</a
+            >
+          </nav>
         </div>
-        <p class="footer-copy">&copy; 2026 KoalaClicker &middot; MIT License</p>
-        <nav class="footer-links" aria-label="Footer navigation">
-          <a href="https://github.com/Shik3i/KoalaClicker" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a>
-          <a href="https://koalastuff.net/legal" class="footer-link"><span lang="en">Legal Notice</span><span lang="de">Impressum</span></a>
-          <a href="datenschutz.html" class="footer-link"><span lang="en">Privacy Policy</span><span lang="de">Datenschutz</span></a>
-        </nav>
       </div>
-    </div>
-  </footer>
+    </footer>
 
-  <script src="app.js" defer></script>
-</body>
+    <script src="app.js" defer=""></script>
+  </body>
 </html>

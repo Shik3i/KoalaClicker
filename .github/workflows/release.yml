@@ -1,48 +1,61 @@
-name: Build and Release Extension
-
+name: Release KoalaClicker
 on:
   push:
-    tags:
-      - 'v*.*.*'
-
+    tags: ["v*"]
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+permissions:
+  contents: read
+env:
+  GH_TOKEN: ${{ github.token }}
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      checks: read
+      id-token: write
+      attestations: write
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: 22
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run release checks
-        run: npm run check
-
-      - name: Build browser extension ZIPs
-        run: npm run build:extension -- --version="${GITHUB_REF_NAME#v}"
-
-      - name: Build reviewer source archive and checksums
-        run: |
-          git archive --format=zip --output="dist/koalaclicker-source-${GITHUB_REF_NAME}.zip" HEAD
-          cd dist
-          sha256sum koalaclicker-*.zip > SHA256SUMS
-
-      - name: Create Release
-        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3
+      - name: Require annotated tag, exact main, CI and CodeQL
+        run: node scripts/release-preflight.mjs
+      - uses: browser-actions/setup-chrome@48ad923757ca74d66703209fe939badbdf80f2f4 # v2
+        id: chrome
         with:
-          files: |
-            dist/koalaclicker-chrome-*.zip
-            dist/koalaclicker-firefox-*.zip
-            dist/koalaclicker-source-*.zip
-            dist/SHA256SUMS
-          generate_release_notes: true
+          chrome-version: 153.0.8010.12
+      - uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1
+        id: firefox
+        with:
+          firefox-version: 155.0.1
+      - run: npm ci
+      - name: Build once, then validate these packages
+        run: npm run check
+      - run: node scripts/audit-dependencies.mjs
+      - run: npm run test:browser:chrome
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KOALACLICKER_CHROME: ${{ steps.chrome.outputs.chrome-path }}
+      - run: npm run test:browser:firefox
+        env:
+          KOALACLICKER_FIREFOX: ${{ steps.firefox.outputs.firefox-path }}
+      - run: npm run test:website
+        env:
+          KOALACLICKER_CHROME: ${{ steps.chrome.outputs.chrome-path }}
+      - name: Add exact-commit source archive, inventories and checksums
+        run: npm run release:package
+      - name: Attest checked archives
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: dist/koalaclicker-*.zip
+      - name: Recheck release eligibility
+        run: node scripts/release-preflight.mjs
+      - name: Create draft, download and verify actual assets, then publish
+        run: node scripts/verify-release.mjs --create --publish --attest

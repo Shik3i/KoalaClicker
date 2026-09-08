@@ -1,42 +1,15 @@
-# Submission Checklist
+# Manual submission checklist
 
-## Release package
+Release version: 1.3.0. The repository's release checks validate the GitHub artifacts; store approval and public website deployment remain separate.
 
-- [ ] Increment `package.json`, `package-lock.json`, `src/manifest.json`, and website version together
-- [ ] Run `npm ci`
-- [ ] Run `npm run check`
-- [ ] Run `npm run lint:firefox`
-- [ ] Confirm zero lint errors and zero lint warnings
-- [ ] Manually test the unpacked Chrome and Firefox packages
-- [ ] Create and push a new `vX.Y.Z` tag only after all checks pass
-
-## Chrome Web Store
-
-- [ ] Upload `dist/koalaclicker-chrome-vX.Y.Z.zip`
-- [ ] Upload `icon-128.png`
-- [ ] Upload `promo-small-440x280.png`
-- [ ] Upload at least one `1280x800` screenshot
-- [ ] Paste the single-purpose and permission justifications from `listing.md`
-- [ ] Complete Privacy Practices with accurate local-data handling
-- [ ] Confirm developer contact email and two-step verification
-- [ ] Verify the public privacy-policy URL over HTTPS
-
-## Firefox Add-ons
-
-- [ ] Upload `dist/koalaclicker-firefox-vX.Y.Z.zip`
-- [ ] Upload `dist/koalaclicker-source-vX.Y.Z.zip` as reviewer source when requested
-- [ ] Confirm Desktop minimum Firefox 140 and Android minimum Firefox 142
-- [ ] Confirm `data_collection_permissions.required: ["none"]`
-- [ ] Provide concise reviewer testing instructions
-- [ ] Verify the public privacy-policy URL over HTTPS
-
-## Manual smoke test
-
-- [ ] Add two clickers on the same origin
-- [ ] Rename both clickers
-- [ ] Change intervals, including the 25 ms minimum
-- [ ] Stop, restart, and delete clickers
-- [ ] Reload the page, reopen the popup, and verify restoration
-- [ ] Verify highlighting and selection cancellation
-- [ ] Verify no automatic or background network requests originate from the extension
-- [ ] Verify browser console contains no extension errors
+- [ ] Confirm final store developer identity/contact and account security in the actual dashboards.
+- [ ] Confirm hosting, logged fields, processing location and full deletion schedule; finalize the pending operator paragraphs before deploying the website privacy page.
+- [ ] Verify the actual public privacy-policy URL and `https://koalastuff.net/legal` before submitting.
+- [ ] Upload the released production Chrome or Firefox ZIP, never a `build/` harness.
+- [ ] Use `listing.md`, the German localization where desired, and browser-specific images from `chrome/` or `firefox/`.
+- [ ] Complete live Privacy Practices/data declarations according to the code and reviewer notes. No blanket legal-compliance or no-data-processing claim.
+- [ ] Supply the released reviewer source ZIP if requested; verify `SHA256SUMS` and provenance.
+- [ ] Firefox: obtain Mozilla signing before permanent distribution. Test the signed package and physical toolbar/shortcut behavior.
+- [ ] Test physical devices/platforms intended for the listing, especially Android. Declared API minimums are not device acceptance.
+- [ ] After approval, add only real official installation/rating URLs; keep unavailable links hidden until then.
+- [ ] Deploy the verified website archive manually and check live routes/headers. No repository workflow performs deployment or store submission.

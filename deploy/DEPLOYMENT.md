@@ -1,75 +1,14 @@
-# KoalaClicker Website Deployment Guide
+# Manual website and store handoff
 
-This guide explains how to host the static KoalaClicker landing website (`/website` directory) securely and efficiently.
+Build: `npm ci` then `npm run build:extension`. The verified website is `dist/website/`; durable release archive: `koalaclicker-website-v1.3.0.zip`. Verify published `SHA256SUMS` before extracting.
 
-## Prerequisites
-- The website is 100% static (pure HTML, CSS, JS).
-- No build step is required.
-- Do **not** use inline scripts (compliant with strict Content Security Policy).
+Only the operator deploys. This repository performs no website upload, hosting configuration, server change or store submission.
 
----
+Before website deployment:
 
-## Option 1: Host with Caddy (Recommended)
+1. Confirm the actual host, processing location, logged fields and full log-deletion policy. Replace the explicit pending-operator paragraphs in `website/datenschutz.html` and `PRIVACY.md` with verified information, then rebuild. Rotation alone is not deletion.
+2. Confirm the intended domain `clicker.koalastuff.net` and the operator/contact information at `https://koalastuff.net/legal`.
+3. Upload the verified static archive manually. Configure the document root for the extracted contents. `deploy/Caddyfile` is an optional template; its relative root assumes running from the repository root with the local build in `dist/website`.
+4. Configure HTTPS and validate local routes, assets, language switching, Privacy/Legal, security headers and 404 behavior on the deployed host. The template deliberately does not enable HSTS preload or assert a live TLS state.
 
-Caddy is the simplest, most modern way to host static websites with automatic HTTPS and excellent security headers.
-
-1. **Install Caddy** on your server.
-2. Place the [Caddyfile](./Caddyfile) in your deployment folder.
-3. Run Caddy from the repository root:
-   ```bash
-   caddy run --config deploy/Caddyfile
-   ```
-
-### Features included in the Caddyfile:
-- **Automatic HTTPS** (via Let's Encrypt).
-- **Zstd & Gzip compression** for ultra-fast load times.
-- **Strict Content Security Policy (CSP)** preventing XSS.
-- **Clean URLs** (e.g. `/impressum` automatically resolves to `/impressum.html`).
-
----
-
-## Option 2: Host with Docker & Caddy
-
-If you prefer containerization:
-
-1. Create a `Dockerfile` in the root:
-   ```dockerfile
-   FROM caddy:2-alpine
-   COPY deploy/Caddyfile /etc/caddy/Caddyfile
-   COPY website /srv
-   ```
-2. Build and run the image:
-   ```bash
-   docker build -t koalaclicker-site .
-   docker run -d -p 80:80 -p 443:443 --name koalaclicker-site koalaclicker-site
-   ```
-
----
-
-## Option 3: Host with Nginx
-
-If using Nginx, configure your site block as follows to achieve similar clean URLs and compression:
-
-```nginx
-server {
-    listen 80;
-    server_name clicker.koalastuff.net;
-    root /var/www/koalaclicker/website;
-    index index.html;
-
-    # Gzip Compression
-    gzip on;
-    gzip_types text/plain text/css application/javascript image/svg+xml;
-
-    # Clean URLs
-    location / {
-        try_files $uri $uri.html $uri/ =404;
-    }
-
-    # Security Headers
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://raw.githubusercontent.com; object-src 'none'; frame-ancestors 'none';" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-Frame-Options "DENY" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-}
-```
+Store material is in `assets/store/`. Chrome uploads, Mozilla signing, reviewer answers and store publication remain manual. Use the production browser ZIPs, never `build/` test harnesses. Firefox unsigned ZIPs support temporary debugging only. Add official installation/rating URLs after real listings are approved; no listing IDs are invented.
