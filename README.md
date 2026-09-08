@@ -37,12 +37,15 @@ Node.js 22.12+ and npm; no runtime framework or third-party library is shipped.
 ```sh
 npm ci
 npm run check
+node scripts/audit-dependencies.mjs
 npm run test:browser:chrome
 npm run test:browser:firefox
 npm run test:website
 ```
 
 `dist/chrome/`, `dist/firefox/`, `dist/website/` and their versioned ZIPs are the local builds. Browser executable overrides: `KOALACLICKER_CHROME`, `KOALACLICKER_FIREFOX`.
+
+The current lockfile replaces the linter's vulnerable `image-size@2.0.2` with the separately maintained [`image-size-next@2.1.1`](https://github.com/lcf2212dev/image-size-next/compare/v2.0.2...v2.1.1), pinned by an npm override and integrity hash. Parser regressions run directly with hard process timeouts; no formats are disabled and the audit gate accepts no advisory exceptions. The immutable v1.3.0 source archive predates this tooling correction and retains its original parser guard.
 
 The Firefox browser test uses a disposable copy with a popup-tab bootstrap and an all-URLs grant required by Firefox tab screenshots. The isolated profile contains only repository fixtures and extension pages. Production permissions remain `activeTab`, `storage`, `scripting`. That harness does not prove physical toolbar activation. Chrome invokes the extension action through its browser protocol; popup controls use DOM events and page selection uses browser pointer input.
 
