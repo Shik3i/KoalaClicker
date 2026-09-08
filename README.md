@@ -1,122 +1,53 @@
-<div align="center">
-  <h1>
-    <img src="src/assets/Logo_Cut_128.png" width="32" height="32" alt="KoalaClicker Logo" valign="middle">
-    KoalaClicker
-  </h1>
-  <p><strong>A modern, privacy-first auto-clicker for idle games and repetitive web tasks.</strong></p>
+# KoalaClicker
 
-  <p>
-    <a href="https://github.com/Shik3i/KoalaClicker/releases/latest"><img src="https://img.shields.io/github/v/release/Shik3i/KoalaClicker?color=bd93f9&label=Latest%20Release&style=flat-square" alt="Latest Release"></a>
-    <a href="https://github.com/Shik3i/KoalaClicker/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-50fa7b?style=flat-square" alt="License: MIT"></a>
-    <img src="https://img.shields.io/badge/Manifest-V3-bd93f9?style=flat-square" alt="Manifest V3">
-    <img src="https://img.shields.io/badge/Dependencies-0-ff79c6?style=flat-square" alt="Zero Dependencies">
-    <img src="https://img.shields.io/badge/Tracking-None-50fa7b?style=flat-square" alt="No Tracking">
-  </p>
+Current build: v1.3.0
 
-  <p>
-    <a href="https://github.com/Shik3i/KoalaClicker/releases/latest">
-      <img src="https://img.shields.io/badge/⬇%20Download%20for%20Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Download for Chrome">
-    </a>
-    &nbsp;
-    <a href="https://github.com/Shik3i/KoalaClicker/releases/latest">
-      <img src="https://img.shields.io/badge/⬇%20Download%20for%20Firefox-FF7139?style=for-the-badge&logo=firefox&logoColor=white" alt="Download for Firefox">
-    </a>
-  </p>
-</div>
+Repeat synthetic mouse clicks on selected elements in a web page. Configure up to 50 targets per website, with independent names and intervals from 25 to 86,400,000 milliseconds.
 
----
+## Use
 
-KoalaClicker lets you automate clicks on any element on any webpage — ideal for idle games like Cookie Clicker, farming simulators, or any repetitive web task. It is built entirely with **Vanilla HTML, CSS, and JavaScript**, has **zero external dependencies**, **no tracking whatsoever**, and is **100% ad-free**.
+Open KoalaClicker using its toolbar icon or `Alt+Shift+K` (`MacCtrl+Shift+K` on macOS). Choose **Add New Clicker**, select a page element, then reopen and press **Start**. A newly selected target is saved **stopped**. Cancel selection with Escape or Cancel.
 
-Unlike most auto-clickers on the market, KoalaClicker uses the **`activeTab` permission model** — it has **zero access** to any page until *you* explicitly click the extension icon. Your CSS selectors and settings are stored 100% locally on your device via `chrome.storage.local` and never transmitted anywhere.
+Rename or change intervals directly in the popup. Valid input is sent immediately to local storage. **Saved** confirms completion; invalid intervals retain the previous saved value. **Stop all** stops this website in already invoked tabs. **Delete** removes one target; **Delete all** removes this website's configurations. **Select target again** replaces a target while keeping its ID and stopping it.
 
----
+Closing the popup leaves clicks running. Navigation, reload and history restoration stop the document; reopen KoalaClicker to resume configured active targets. Settings are shared across paths of the same origin; different origins are separate.
 
-## ✨ Features
+## Limits
 
-| Feature | Details |
-|---|---|
-| 🔒 **Privacy First** | Uses `activeTab` only. No access to any tab until you click the icon. Zero tracking, zero telemetry, 100% ad-free. |
-| 🎯 **Multiple Clickers** | Add up to **50 parallel clickers** per website, each with its own interval and label. |
-| ⚡ **Ultra-Fast Clicking** | Minimum interval of **25ms** (40 clicks/sec). Handles multiple elements simultaneously. |
-| 🎮 **Cookie Clicker Compatibility** | Applies a narrowly scoped timing adjustment only on the official Cookie Clicker host. |
-| ✏️ **Inline Editing** | Rename clickers, adjust intervals, start/stop individually — all live in the popup. |
-| 👁 **Live Highlighting** | Hover over a clicker card in the popup and the corresponding element is highlighted on the page in real time. |
-| 💾 **State Resumption** | Clickers are saved per-site. Reopen the popup after a page reload to resume instantly. |
-| 🌐 **Cross-Browser** | Works on Chrome, Firefox, Edge, Brave, and any Chromium-based browser. |
-| 🪶 **Lightweight** | Pure Vanilla JS — no frameworks, no build tools, no bloat. |
+- Chrome 120+ and Firefox Desktop 140+ package API baselines. Actual browser versions tested are recorded by the browser jobs. Firefox Android 142+ is declared as an API baseline, not proof of physical-device acceptance.
+- Only regular HTTP/HTTPS top-level documents. Browser-protected pages may reject injection. Frames, Shadow DOM and canvas contents are unsupported.
+- Unique selectors are required. Hidden, disabled, ambiguous, covered and offscreen targets are skipped. A changed page can invalidate a structural selector; select the target again.
+- Synthetic `mousedown`, `mouseup`, `click` events have `isTrusted=false`. They cannot supply trusted hardware input or user activation. Websites may reject them. Cookie Clicker's internal timing is no longer modified; its own click-rate rules apply.
+- 25 ms is a requested interval, not a guarantee of 40 accepted clicks per second. Background throttling, minimization and suspension can reduce the rate. No accumulated clicks are replayed after sleep.
+- Clicks can submit forms, navigate or cause target-page network requests. Selection suppresses events before ordinary page handlers, but a page's earlier window-capture listeners can observe input. Use only targets whose actions you intend.
 
----
+## Install locally
 
-## 📦 Installation
+Download [v1.3.0](https://github.com/Shik3i/KoalaClicker/releases/tag/v1.3.0).
 
-### Option A — Chrome Web Store *(coming soon)*
+- Chrome: extract `koalaclicker-chrome-v1.3.0.zip`, open `chrome://extensions`, enable Developer mode, choose Load unpacked.
+- Firefox: extract `koalaclicker-firefox-v1.3.0.zip`, open `about:debugging#/runtime/this-firefox`, Load Temporary Add-on, choose `manifest.json`. Unsigned temporary installations end when Firefox restarts. Permanent distribution requires Mozilla signing.
 
-> The extension will be available directly on the Chrome Web Store. Click Install — no unzipping required.
+Official store installation/rating links are withheld until real listings are available.
 
-### Option B — Manual Install (Releases)
+## Build and verify
 
-1. Go to the **[Latest Releases](https://github.com/Shik3i/KoalaClicker/releases/latest)** page and download the `.zip` for your browser.
-2. Unzip the downloaded file.
+Node.js 22.12+ and npm; no runtime framework or third-party library is shipped.
 
-**Chrome / Edge / Brave:**
-- Open `chrome://extensions/`
-- Enable **Developer mode** (top right toggle)
-- Click **Load unpacked** → select the unzipped folder
-
-**Firefox:**
-- Open `about:debugging#/runtime/this-firefox`
-- Click **Load Temporary Add-on** → select the `manifest.json` inside the unzipped folder
-
----
-
-## 🚀 Quick Start
-
-1. **Navigate** to any webpage (e.g. an idle game).
-2. **Click** the KoalaClicker icon in your browser toolbar.
-3. Press **"Add New Clicker"** — the popup closes and Element Selection Mode activates.
-4. **Hover** over any element on the page — it will glow pink to confirm your target.
-5. **Click** the element to register it. The clicker starts immediately!
-6. Reopen the popup anytime to rename, adjust the speed, pause, or delete clickers.
-
-> 💡 **Pro Tip:** After a page reload, click the extension icon once — active clickers for that website reload and resume.
-
----
-
-## 🔒 Privacy & Security
-
-KoalaClicker is designed to be the most privacy-respecting auto-clicker available:
-
-- **`activeTab` only**: The extension gains page access *only* when you explicitly click its icon. It cannot read your browsing history, access other tabs, or run in the background.
-- **No background requests**: KoalaClicker sends no browsing or clicker data anywhere and performs no automatic network requests. External links open only after a user click.
-- **Local storage only**: Your configurations (selectors, intervals, names) are stored exclusively in `chrome.storage.local` on your device.
-- **No eval()**: No dynamic code execution from external sources.
-- **Open Source**: The entire codebase is here for you to audit.
-
-Read the full [Privacy Policy](PRIVACY.md).
-
----
-
-## 🛠 For Developers
-
-```bash
-git clone https://github.com/Shik3i/KoalaClicker.git
-cd KoalaClicker
+```sh
 npm ci
 npm run check
-# Load the /dist/chrome folder as an unpacked extension in chrome://extensions/
+npm run test:browser:chrome
+npm run test:browser:firefox
+npm run test:website
 ```
 
-- All extension code lives in [`src/`](src/)
-- Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for a full breakdown of the data flows and component design
-- Read [`USAGE.md`](USAGE.md) for the full user guide and FAQ
-- The GitHub Actions workflow in [`.github/workflows/release.yml`](.github/workflows/release.yml) uses the local build script to inject the tag version and build both Chrome and Firefox ZIPs on every `v*.*.*` tag push
-- Store-ready artwork, screenshots, listing copy, and the submission checklist live in [`assets/store/`](assets/store/)
+`dist/chrome/`, `dist/firefox/`, `dist/website/` and their versioned ZIPs are the local builds. Browser executable overrides: `KOALACLICKER_CHROME`, `KOALACLICKER_FIREFOX`.
 
-**Stack:** Vanilla JS · Vanilla CSS · HTML5 · Manifest V3 · Zero runtime dependencies
+The Firefox browser test uses a disposable copy with a popup-tab bootstrap and an all-URLs grant required by Firefox tab screenshots. The isolated profile contains only repository fixtures and extension pages. Production permissions remain `activeTab`, `storage`, `scripting`. That harness does not prove physical toolbar activation. Chrome invokes the extension action through its browser protocol; popup controls use DOM events and page selection uses browser pointer input.
 
----
+## Release
 
-## 📄 License
+Prepare matching source/package/website versions before tagging. Merge the PR after verify, Chrome, Firefox, website and CodeQL checks succeed. An annotated tag must point to the checked `main` commit. The release workflow validates those gates, tests the built packages, creates Chrome/Firefox/source/website archives and provenance, verifies authenticated draft downloads, then publishes. Published releases are never replaced. Website and store deployment remain manual; see [deployment notes](deploy/DEPLOYMENT.md).
 
-Released under the [MIT License](LICENSE). © 2026 Shik3i
+Store submission material: [assets/store](assets/store/README.md). [Privacy](PRIVACY.md) · [Legal](https://koalastuff.net/legal) · [Help](USAGE.md) · [Support](https://github.com/Shik3i/KoalaClicker/issues).

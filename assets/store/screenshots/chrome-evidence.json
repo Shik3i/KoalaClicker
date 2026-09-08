@@ -1,0 +1,29 @@
+{
+  "browser": "Chrome/153.0.8010.12",
+  "version": "1.3.0",
+  "activation": "CDP Extensions.triggerAction with production manifest",
+  "checks": [
+    "real action activation with unchanged production permissions and empty state",
+    "selection Escape restores page interaction",
+    "selection suppresses pointer/mouse handlers and link navigation; saves stopped",
+    "selection double-click does not activate the target",
+    "input followed by immediate popup closure persists",
+    "start produces actual target-page effects",
+    "stop-all clears active timers",
+    "same-ID reselection runs only the new selector",
+    "duplicate IDs generate a unique structural selector",
+    "same-origin tab updates stop already injected documents",
+    "SPA route change stops active timers",
+    "reload does not inject or restart until invocation",
+    "selection does not submit forms",
+    "protected page shows a recoverable disabled state",
+    "hidden and disabled targets are skipped",
+    "missing target status is visible",
+    "DOM replacement resolves a fresh element",
+    "covered, offscreen and newly ambiguous targets are skipped",
+    "different origins have separate settings and cannot stop existing timers",
+    "50 targets remain scrollable with labelled inputs and disabled add",
+    "history back leaves timers stopped (BFCache restored: true)",
+    "extension uninstall invalidates running content timers"
+  ]
+}

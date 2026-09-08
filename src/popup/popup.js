@@ -1,257 +1,264 @@
-document.addEventListener('DOMContentLoaded', async () => {
-  const addBtn = document.getElementById('add-clicker-btn');
-  const listContainer = document.getElementById('clickers-list');
-  const emptyState = document.getElementById('empty-state');
-
-  // Set version label immediately — before any early returns so it's always visible
-  const versionLabel = document.getElementById('version-label');
-  const manifest = chrome.runtime.getManifest();
-  if (versionLabel && manifest) {
-    versionLabel.textContent = `v${manifest.version}`;
+document.addEventListener("DOMContentLoaded", async () => {
+  const api = globalThis.browser || chrome;
+  const model = KoalaClickerModel;
+  const add = document.getElementById("add-clicker-btn");
+  const stopAll = document.getElementById("stop-all-btn");
+  const clear = document.getElementById("clear-btn");
+  const list = document.getElementById("clickers-list");
+  const empty = document.getElementById("empty-state");
+  const feedback = document.getElementById("feedback");
+  document.getElementById("version-label").textContent =
+    `v${api.runtime.getManifest().version}`;
+  let tab,
+    token,
+    revision = -1,
+    state = [],
+    pending = 0;
+  function error(message) {
+    feedback.textContent = message;
+    feedback.className = "error";
   }
-
-  // Get current active tab
-  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (tabs.length === 0) return;
-  const tab = tabs[0];
-
-  const urlObj = KoalaClickerModel.parseSiteUrl(tab.url);
-  if (!urlObj) {
-    addBtn.disabled = true;
-    addBtn.style.opacity = '0.5';
-    addBtn.style.cursor = 'not-allowed';
-    emptyState.textContent = "Cannot run on this page.";
-    emptyState.style.display = 'block';
-    return;
+  async function page(action, extra = {}) {
+    const result = await api.tabs.sendMessage(
+      tab.id,
+      { action, url: tab.url, token, ...extra },
+      { frameId: 0 },
+    );
+    if (!result?.ok)
+      throw new Error(
+        result?.error || "Page unavailable. Reopen KoalaClicker.",
+      );
+    return result;
   }
-
-  const siteKey = urlObj.origin;
-  const legacySiteKey = urlObj.origin + urlObj.pathname;
-
-  // Inject content script if not already injected
-  try {
-    await injectContentScriptIfNeeded(tab.id);
-  } catch (e) {
-    console.error("Failed to inject content script", e);
-    addBtn.disabled = true;
-    addBtn.style.opacity = '0.5';
-    addBtn.style.cursor = 'not-allowed';
-    emptyState.textContent = "Script injection is blocked on this page (e.g. Chrome Web Store or local file without permission).";
-    emptyState.style.display = 'block';
-    return;
-  }
-
-  // Load saved clickers
-  await loadAndRenderClickers();
-
-  // "Add New Clicker" button logic
-  addBtn.addEventListener('click', async () => {
+  async function store(op, extra = {}) {
+    pending++;
+    feedback.className = "";
+    feedback.textContent = "Saving…";
     try {
-      // Tell content script to enter selection mode
-      await chrome.tabs.sendMessage(tab.id, { action: 'ENTER_SELECTION_MODE', url: siteKey });
-    } catch (e) {
-      console.error("Failed to enter selection mode", e);
-    }
-    window.close(); // Close popup so user can interact with the page
-  });
-
-  async function injectContentScriptIfNeeded(tabId) {
-    try {
-      // Check if it responds
-      await chrome.tabs.sendMessage(tabId, { action: 'PING' });
-    } catch (e) {
-      // Need to inject isolated content script and CSS
-      await chrome.scripting.insertCSS({
-        target: { tabId: tabId },
-        files: ['content/content.css']
+      // Dispatch immediately; no popup-owned debounce or delayed write survives closure.
+      const result = await api.runtime.sendMessage({
+        action: "STORE",
+        op,
+        url: tab.url,
+        tabId: tab.id,
+        token,
+        ...extra,
       });
-      await chrome.scripting.executeScript({
-        target: { tabId: tabId },
-        files: ['shared/model.js', 'content/content.js']
-      });
-      // Inject native MAIN-world compatibility script (CSP immune)
-      try {
-        await chrome.scripting.executeScript({
-          target: { tabId: tabId },
-          world: 'MAIN',
-          files: ['content/compatibility.js']
-        });
-      } catch (compatibilityError) {
-        console.warn("KoalaClicker: Failed to inject main-world compatibility script.", compatibilityError);
+      if (!result?.ok)
+        throw new Error(result?.error || "Storage failed. Try again.");
+      if (result.revision >= revision) {
+        revision = result.revision;
+        state = result.clickers;
+        render();
       }
-      // Give it a tiny moment to initialize
-      await new Promise(r => setTimeout(r, 50));
+      feedback.textContent = "Saved";
+      return result;
+    } catch (cause) {
+      error(cause.message);
+      throw cause;
+    } finally {
+      pending--;
     }
   }
-
-  async function loadAndRenderClickers() {
-    chrome.storage.local.get([siteKey, legacySiteKey], (result) => {
-      const storedClickers = result[siteKey] || result[legacySiteKey] || [];
-      const clickers = KoalaClickerModel.normalizeClickers(storedClickers);
-
-      if (!result[siteKey] && result[legacySiteKey]) {
-        chrome.storage.local.set({ [siteKey]: clickers }, () => {
-          chrome.storage.local.remove(legacySiteKey);
+  async function select(id) {
+    add.disabled = true;
+    try {
+      await page("SELECT", { id });
+      window.close();
+    } catch (cause) {
+      error(cause.message);
+      add.disabled = false;
+    }
+  }
+  function render() {
+    empty.hidden = state.length !== 0;
+    empty.textContent =
+      "No saved clickers for this website. Add a target to begin.";
+    add.disabled = state.length >= model.MAX_CLICKERS;
+    stopAll.disabled = !state.some((item) => item.active);
+    clear.disabled = state.length === 0;
+    const ids = new Set(state.map((item) => item.id));
+    for (const child of [...list.children])
+      if (!ids.has(child.dataset.id)) child.remove();
+    state.forEach((clicker, index) => {
+      let item = [...list.children].find(
+        (child) => child.dataset.id === clicker.id,
+      );
+      if (!item) {
+        item = document.createElement("section");
+        item.className = "clicker-item";
+        item.dataset.id = clicker.id;
+        const header = document.createElement("div");
+        header.className = "clicker-header";
+        const name = document.createElement("input");
+        name.className = "clicker-name-input";
+        name.maxLength = model.MAX_NAME_LENGTH;
+        name.setAttribute("aria-label", `Clicker ${index + 1} name`);
+        const badge = document.createElement("span");
+        badge.className = "status-badge";
+        badge.setAttribute("role", "status");
+        header.append(name, badge);
+        const controls = document.createElement("div");
+        controls.className = "clicker-controls";
+        const interval = document.createElement("input");
+        interval.type = "number";
+        interval.className = "interval-input";
+        interval.min = model.MIN_INTERVAL;
+        interval.max = model.MAX_INTERVAL;
+        interval.step = "1";
+        interval.setAttribute("aria-label", "Interval in milliseconds");
+        const unit = document.createElement("span");
+        unit.className = "interval-label";
+        unit.textContent = "ms";
+        const toggle = document.createElement("button");
+        toggle.className = "btn-icon btn-stop";
+        toggle.type = "button";
+        const remove = document.createElement("button");
+        remove.className = "btn-icon btn-remove";
+        remove.textContent = "Delete";
+        remove.type = "button";
+        const target = document.createElement("button");
+        target.className = "target-btn";
+        target.type = "button";
+        target.textContent = "Select target again";
+        const patch = (value) =>
+          store("patch", { id: clicker.id, patch: value }).catch(() => {});
+        name.addEventListener("input", () => patch({ name: name.value }));
+        interval.addEventListener("input", () => {
+          if (!interval.value || !interval.checkValidity()) {
+            interval.setAttribute("aria-invalid", "true");
+            error(
+              "Interval must be a whole number from 25 to 86400000 ms. Previous value remains saved.",
+            );
+            return;
+          }
+          interval.removeAttribute("aria-invalid");
+          patch({ interval: Number(interval.value) });
         });
-      } else if (JSON.stringify(storedClickers) !== JSON.stringify(clickers)) {
-        chrome.storage.local.set({ [siteKey]: clickers });
-      }
-      
-      if (clickers.length === 0) {
-        emptyState.style.display = 'block';
-        listContainer.innerHTML = '';
-        return;
-      }
-      
-      emptyState.style.display = 'none';
-      listContainer.innerHTML = '';
-
-      clickers.forEach((clicker, index) => {
-        const item = document.createElement('div');
-        item.className = 'clicker-item';
-        
-        const header = document.createElement('div');
-        header.className = 'clicker-header';
-
-        const nameInput = document.createElement('input');
-        nameInput.type = 'text';
-        nameInput.className = 'clicker-name-input';
-        nameInput.value = clicker.name || 'Clicker ' + (index + 1);
-        nameInput.title = `Selector: ${clicker.selector}`;
-        nameInput.placeholder = 'Name this clicker';
-        nameInput.maxLength = KoalaClickerModel.MAX_NAME_LENGTH;
-
-        const statusBadge = document.createElement('span');
-        statusBadge.className = `status-badge ${clicker.active ? '' : 'stopped'}`;
-        statusBadge.textContent = clicker.active ? 'Running' : 'Stopped';
-
-        header.appendChild(nameInput);
-        header.appendChild(statusBadge);
-
-        const controls = document.createElement('div');
-        controls.className = 'clicker-controls';
-
-        const intervalInput = document.createElement('input');
-        intervalInput.type = 'number';
-        intervalInput.className = 'interval-input';
-        intervalInput.value = clicker.interval;
-        intervalInput.min = String(KoalaClickerModel.MIN_INTERVAL);
-        intervalInput.max = String(KoalaClickerModel.MAX_INTERVAL);
-        intervalInput.step = '25';
-
-        const intervalLabel = document.createElement('span');
-        intervalLabel.className = 'interval-label';
-        intervalLabel.textContent = 'ms';
-
-        const stopBtn = document.createElement('button');
-        stopBtn.className = `btn-icon btn-stop ${clicker.active ? '' : 'is-stopped'}`;
-        stopBtn.textContent = clicker.active ? 'Stop' : 'Start';
-
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'btn-icon btn-remove';
-        removeBtn.textContent = 'Del';
-
-        controls.appendChild(intervalInput);
-        controls.appendChild(intervalLabel);
-        controls.appendChild(stopBtn);
-        controls.appendChild(removeBtn);
-
-        item.appendChild(header);
-        item.appendChild(controls);
-
-        nameInput.addEventListener('input', (e) => {
-          clicker.name = e.target.value;
-          debouncedUpdateSilently(clickers);
+        interval.addEventListener("change", () => {
+          if (!interval.value || !interval.checkValidity())
+            interval.value =
+              state.find((entry) => entry.id === clicker.id)?.interval ?? 250;
+          interval.removeAttribute("aria-invalid");
         });
-
-        nameInput.addEventListener('change', (e) => {
-          clicker.name = e.target.value;
-          updateClickersSilently(clickers);
-        });
-
-        intervalInput.addEventListener('input', (e) => {
-          let val = parseInt(e.target.value, 10);
-          if (isNaN(val) || val < KoalaClickerModel.MIN_INTERVAL) val = KoalaClickerModel.MIN_INTERVAL;
-          if (val > KoalaClickerModel.MAX_INTERVAL) val = KoalaClickerModel.MAX_INTERVAL;
-          clicker.interval = val;
-          debouncedUpdateSilently(clickers);
-        });
-
-        intervalInput.addEventListener('change', (e) => {
-          let val = parseInt(e.target.value, 10);
-          if (isNaN(val) || val < KoalaClickerModel.MIN_INTERVAL) val = KoalaClickerModel.MIN_INTERVAL;
-          if (val > KoalaClickerModel.MAX_INTERVAL) val = KoalaClickerModel.MAX_INTERVAL;
-          clicker.interval = val;
-          e.target.value = val; // Ensure visual correction
-          updateClickersSilently(clickers);
-        });
-
-        // Highlight element on hover
-        item.addEventListener('mouseenter', () => {
-          chrome.tabs.sendMessage(tab.id, { action: 'HIGHLIGHT_ELEMENT', selector: clicker.selector });
-        });
-        
-        item.addEventListener('mouseleave', () => {
-          chrome.tabs.sendMessage(tab.id, { action: 'UNHIGHLIGHT_ELEMENT' });
-        });
-
-        stopBtn.addEventListener('click', () => {
-          clicker.active = !clicker.active;
-          
-          // Update visual state in place without full DOM rebuild
-          statusBadge.className = `status-badge ${clicker.active ? '' : 'stopped'}`;
-          statusBadge.textContent = clicker.active ? 'Running' : 'Stopped';
-          stopBtn.className = `btn-icon btn-stop ${clicker.active ? '' : 'is-stopped'}`;
-          stopBtn.textContent = clicker.active ? 'Stop' : 'Start';
-          
-          updateClickersSilently(clickers);
-        });
-
-        removeBtn.addEventListener('click', () => {
-          // Find the current index by id at deletion time to avoid stale-index bug
-          const currentClickers = clickers;
-          const idx = currentClickers.findIndex(c => c.id === clicker.id);
-          if (idx !== -1) {
-            currentClickers.splice(idx, 1);
-            updateClicker(currentClickers);
+        toggle.addEventListener("click", async () => {
+          toggle.disabled = true;
+          try {
+            await store("patch", {
+              id: clicker.id,
+              patch: {
+                active: !state.find((entry) => entry.id === clicker.id)?.active,
+              },
+            });
+          } catch {
+          } finally {
+            toggle.disabled = false;
           }
         });
-
-        listContainer.appendChild(item);
+        remove.addEventListener("click", async () => {
+          remove.disabled = true;
+          try {
+            await store("delete", { id: clicker.id });
+            add.focus();
+          } catch {
+          } finally {
+            remove.disabled = false;
+          }
+        });
+        target.addEventListener("click", () => select(clicker.id));
+        controls.append(interval, unit, toggle, remove);
+        item.append(header, controls, target);
+        list.append(item);
+      }
+      const name = item.querySelector(".clicker-name-input");
+      const interval = item.querySelector(".interval-input");
+      if (document.activeElement !== name) name.value = clicker.name;
+      if (document.activeElement !== interval)
+        interval.value = clicker.interval;
+      name.title = clicker.selector;
+      const badge = item.querySelector(".status-badge");
+      badge.textContent = clicker.active ? "Running" : "Stopped";
+      badge.classList.toggle("stopped", !clicker.active);
+      const toggle = item.querySelector(".btn-stop");
+      toggle.textContent = clicker.active ? "Stop" : "Start";
+      toggle.classList.toggle("is-stopped", !clicker.active);
+    });
+  }
+  add.disabled = stopAll.disabled = clear.disabled = true;
+  try {
+    [tab] = await api.tabs.query({ active: true, currentWindow: true });
+    if (!model.parseSiteUrl(tab?.url))
+      throw new Error(
+        "Cannot run on this page. Open a regular HTTP or HTTPS website.",
+      );
+    document.getElementById("site-label").textContent = new URL(
+      tab.url,
+    ).hostname;
+    let ping;
+    try {
+      ping = await api.tabs.sendMessage(
+        tab.id,
+        { action: "PING" },
+        { frameId: 0 },
+      );
+    } catch {
+      await api.scripting.insertCSS({
+        target: { tabId: tab.id, frameIds: [0] },
+        files: ["/content/content.css"],
       });
-
-      // Send the current list to the content script so it syncs its running intervals
-      chrome.tabs.sendMessage(tab.id, { action: 'SYNC_CLICKERS', clickers: clickers, url: siteKey }).catch(() => {});
+      await api.scripting.executeScript({
+        target: { tabId: tab.id, frameIds: [0] },
+        files: ["/shared/model.js", "/content/content.js"],
+      });
+      ping = await api.tabs.sendMessage(
+        tab.id,
+        { action: "PING" },
+        { frameId: 0 },
+      );
+    }
+    if (ping?.url !== tab.url)
+      throw new Error("The page changed. Reopen KoalaClicker.");
+    token = ping.token;
+    clear.disabled = false;
+    clear.addEventListener("click", () => {
+      if (confirm("Delete all saved clickers for this website?"))
+        store("clear").catch(() => {});
     });
-  }
-
-  function updateClicker(clickers) {
-    const obj = {};
-    obj[siteKey] = clickers;
-    chrome.storage.local.set(obj, () => {
-      loadAndRenderClickers();
+    const result = await page("INIT");
+    revision = result.revision;
+    state = result.clickers;
+    render();
+    feedback.textContent = "";
+    add.addEventListener("click", () => select());
+    stopAll.addEventListener("click", () => store("stopAll").catch(() => {}));
+    api.storage.onChanged.addListener((changes, area) => {
+      const value = changes[`site:${new URL(tab.url).origin}`]?.newValue;
+      if (area === "local" && value && value.revision > revision) {
+        revision = value.revision;
+        state = value.clickers;
+        render();
+      }
     });
+    async function statuses() {
+      try {
+        const result = await page("STATUS");
+        for (const item of list.children) {
+          const badge = item.querySelector(".status-badge");
+          if (result.states[item.dataset.id])
+            badge.textContent = result.states[item.dataset.id];
+        }
+      } catch (cause) {
+        error(cause.message);
+        add.disabled = true;
+      }
+    }
+    await statuses();
+    setInterval(statuses, 1000);
+  } catch (cause) {
+    error(
+      `${cause.message} Browser store pages and protected pages may block access.`,
+    );
+    empty.textContent =
+      "Switch to a supported website, then reopen KoalaClicker.";
   }
-
-  function updateClickersSilently(clickers) {
-    const obj = {};
-    obj[siteKey] = clickers;
-    chrome.storage.local.set(obj, () => {
-      chrome.tabs.sendMessage(tab.id, { action: 'SYNC_CLICKERS', clickers: clickers, url: siteKey }).catch(() => {});
-    });
-  }
-
-  function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
-
-  const debouncedUpdateSilently = debounce(updateClickersSilently, 300);
 });

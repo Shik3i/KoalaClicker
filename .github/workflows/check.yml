@@ -1,29 +1,73 @@
 name: Check Extension
-
 on:
   pull_request:
   push:
-    branches:
-      - main
-
+    branches: ["**"]
 permissions:
   contents: read
-
 jobs:
-  check:
+  verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: 22
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run release checks
-        run: npm run check
+      - run: npm ci
+      - run: npm run check
+      - run: node scripts/audit-dependencies.mjs
+      - run: npm run release:package
+  browser:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          cache: npm
+      - uses: browser-actions/setup-chrome@48ad923757ca74d66703209fe939badbdf80f2f4 # v2
+        if: matrix.browser == 'chrome'
+        id: chrome
+        with:
+          chrome-version: 153.0.8010.12
+      - uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1
+        if: matrix.browser == 'firefox'
+        id: firefox
+        with:
+          firefox-version: 155.0.1
+      - run: npm ci
+      - run: npm run build:extension
+      - run: npm run test:browser:${{ matrix.browser }}
+        env:
+          KOALACLICKER_CHROME: ${{ steps.chrome.outputs.chrome-path }}
+          KOALACLICKER_FIREFOX: ${{ steps.firefox.outputs.firefox-path }}
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: browser-${{ matrix.browser }}
+          path: |
+            build/browser-${{ matrix.browser }}/*.png
+            build/browser-${{ matrix.browser }}/evidence.json
+          if-no-files-found: ignore
+  website:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          cache: npm
+      - uses: browser-actions/setup-chrome@48ad923757ca74d66703209fe939badbdf80f2f4 # v2
+        id: chrome
+        with:
+          chrome-version: 153.0.8010.12
+      - run: npm ci
+      - run: npm run build:extension
+      - run: npm run test:website
+        env:
+          KOALACLICKER_CHROME: ${{ steps.chrome.outputs.chrome-path }}

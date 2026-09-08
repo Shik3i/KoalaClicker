@@ -1,87 +1,18 @@
-# KoalaClicker Architecture
+# Architecture
 
-This document explains the technical foundation and data flows of the KoalaClicker extension. It is built entirely with Vanilla JavaScript, HTML, and CSS, adhering to Manifest V3 standards.
+KoalaClicker 1.3.0 ships vanilla HTML/CSS/JavaScript with no runtime libraries. npm dependencies support build, tests and Firefox validation only.
 
-## 1. Core Principles
-- **Zero Dependencies**: The project uses no external libraries. Everything is built natively for maximum performance and minimal footprint.
-- **Privacy-First (activeTab)**: The extension uses the `activeTab` permission. It only ever gains access to a web page when the user explicitly clicks the extension icon in the toolbar. It does **not** automatically inject scripts on page load.
-- **Stateless Content Scripts**: Because the `activeTab` permission drops upon page reload, the content script relies on `chrome.storage.local` to restore state if the user clicks the extension icon again.
+- `src/popup/`: action popup, immediate field operations, persisted-state feedback, status polling and document-bound page actions.
+- `src/background.js`: sole storage writer. A promise queue serializes read/modify/write operations across popups and content documents. Operations patch individual IDs/fields; stale edits cannot reinsert deleted records. Failures do not poison later requests. Chrome uses an MV3 service worker; Firefox uses an event background page.
+- `src/shared/model.js`: URL validation, bounded normalization and deterministic migration IDs.
+- `src/content/content.js`: on-demand top-level selection, unique selectors, synthetic events, timers, storage-change synchronization and document/route invalidation. No static content scripts or standing host permissions.
 
-## 2. Component Overview
+Storage records use `site:<origin>` with `{revision, clickers, legacyMigrated}`. Each clicker contains ID, selector, name, interval and active flag. Legacy origin and origin-plus-path records are merged locally, deduplicated by ID and selector and removed only after a successful new write. The migration marker prevents reimport after a failed cleanup. Overflow is reported without discarding originals. Empty records can retain the origin/revision after deletion; uninstall removes all extension storage.
 
-### A. The Popup (`src/popup/`)
-The popup acts as the control center.
-- **Responsibilities**: Displays active clickers, allows adding/removing clickers, and modifies the click intervals.
-- **Initialization**: Upon opening, it checks `chrome.storage.local` using the current tab's Origin + Pathname as the key. If clickers exist, it renders them. It also injects the content script into the active tab if it's not already running.
+The popup first injects packaged files if PING fails, then verifies the exact page URL and document token. The background rechecks tokens on document-bound mutations. Content listeners reject stale tokens, reset on navigation and stop timers on pagehide/history transitions. Timer callbacks also detect route changes and invalid extension contexts. Reopening resumes persisted active settings on the current document. The browser may retain an activeTab grant across some same-origin navigation, but this extension does not automatically reinject.
 
-### B. The Content Script (`src/content/`)
-The script injected into the active webpage.
-- **Responsibilities**: Handles the DOM traversal for element selection, generates unique CSS selectors, and runs the actual `setInterval` auto-clicking loops.
-- **Isolation**: Uses an IIFE to avoid polluting the global window object.
+Each timer resolves the selector again and requires a single, visible, enabled, uncovered target in the viewport. It emits untrusted mousedown/mouseup/click events. Page handlers govern effects. Selecting targets captures pointer/mouse events at window level, cancels default behavior, and supports Escape; earlier page capture listeners remain an unavoidable limit. The selection banner uses an isolated ShadowRoot for style containment.
 
-## 3. Data Flow & Communication
+The old MAIN-world helper reset Cookie Clicker's Game.lastClick clock. Version 1.3.0 removes that page-state mutation and uses the same synthetic event path for all sites, respecting website timing and trust checks.
 
-The extension relies heavily on Message Passing between the Popup and the Content Script.
-
-### Example Flow: Adding a New Clicker
-1. **User Action**: The user clicks "Add New Clicker" in the popup.
-2. **Popup Action**: The popup sends a message to the content script and closes itself so the user can interact with the page.
-   ```javascript
-   chrome.tabs.sendMessage(tab.id, { action: 'ENTER_SELECTION_MODE', url: siteKey });
-   window.close();
-   ```
-3. **Content Script Action**: Receives the message, displays a banner, and adds `mouseover` and `click` listeners to highlight elements.
-4. **Element Selection**: The user clicks an element on the page. The content script prevents the default click behavior, generates a unique DOM path selector, and saves it to storage.
-   ```javascript
-   const selector = generateSelector(e.target);
-   chrome.storage.local.get([currentSiteKey], (result) => {
-     // Append new clicker and save
-     chrome.storage.local.set({ [currentSiteKey]: updatedClickers }, () => {
-       syncClickers(updatedClickers); // Start the interval
-     });
-   });
-   ```
-
-### Example Flow: Syncing Timers
-Whenever the popup updates a clicker's interval or toggles its state, it saves to storage and sends a `SYNC_CLICKERS` message:
-```javascript
-// Popup
-chrome.tabs.sendMessage(tab.id, { action: 'SYNC_CLICKERS', clickers: updatedList, url: siteKey });
-```
-```javascript
-// Content Script
-function syncClickers(clickers) {
-  // Clear any timers that are no longer active
-  // Restart timers for active clickers with the exact requested interval
-  activeTimers[clicker.id] = setInterval(() => {
-    triggerClick(clicker.selector);
-  }, clicker.interval);
-}
-```
-
-## 4. DOM Selector Generation
-To ensure we can find the element again even if the page is slightly reloaded, the content script generates a robust CSS selector.
-If the element has an ID, it uses the ID. If not, it builds a structural path up the DOM tree using `:nth-of-type()`.
-```javascript
-// Example generated output:
-"body > div#app > main > button:nth-of-type(2)"
-```
-
-## 5. Build Pipeline
-The `.github/workflows/release.yml` handles creating production-ready `.zip` files.
-When a tag like `v1.0.5` is pushed:
-1. It extracts `1.0.5` and injects it into `manifest.json`.
-2. It zips the `src/` folder for Chrome.
-3. It dynamically injects `browser_specific_settings` (required for Firefox MV3) into the Firefox manifest and zips both browser folders.
-4. It creates a GitHub release and attaches the ZIPs.
-
-The Firefox package targets Firefox Desktop 140+ and Firefox for Android 142+.
-These versions support both MAIN-world script execution and Mozilla's built-in
-data-collection declaration. KoalaClicker declares `none` because it does not
-transmit data outside the local browser.
-
-The MAIN-world compatibility helper is limited to `orteil.dashnet.org` and is
-event-driven. It receives a DOM event immediately before an active clicker
-dispatches its synthetic mouse-event sequence. It does not poll, run a
-background interval, affect other hosts, or modify page state while
-KoalaClicker is idle.
+Build copies source and creates browser-specific manifests; it never rewrites a tagged version. Browser tests use these builds. The release adds an exact-commit reviewer source archive, a website archive, full SHA256 inventories and attestations. Draft assets are downloaded and verified before publication. Deployment is manual.

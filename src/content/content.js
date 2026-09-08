@@ -1,300 +1,342 @@
-// KoalaClicker content script
+// Injected only after the user invokes the extension on this document.
 (() => {
-  if (window.koalaClickerInjected) return;
-  window.koalaClickerInjected = true;
+  if (globalThis.koalaClickerInjected) return;
+  globalThis.koalaClickerInjected = true;
+  const api = globalThis.browser || chrome;
+  let documentToken = crypto.randomUUID();
+  let route = location.href;
+  let enabled = false;
+  let revision = -1;
+  let clickers = [];
+  let selection = null;
+  let hovered = null;
+  let suppressUntil = 0;
+  let releaseSelectionEvents;
+  const timers = new Map();
+  const status = new Map();
+  const host = document.createElement("div");
+  host.style.cssText =
+    "all:initial;position:fixed;inset:0;pointer-events:none;z-index:2147483647";
+  const shadow = host.attachShadow({ mode: "closed" });
+  const banner = document.createElement("div");
+  banner.style.cssText =
+    "display:none;pointer-events:auto;position:absolute;top:12px;left:50%;transform:translateX(-50%);max-width:90vw;background:#282a36;color:#f8f8f2;padding:14px;border:2px solid #bd93f9;border-radius:8px;font:14px system-ui";
+  banner.setAttribute("role", "status");
+  const label = document.createElement("span");
+  const cancel = document.createElement("button");
+  cancel.type = "button";
+  cancel.textContent = "Cancel (Esc)";
+  cancel.style.cssText =
+    "margin-left:12px;padding:8px;background:#bd93f9;color:#1e1e2e;border:0;border-radius:4px";
+  banner.append(label, cancel);
+  shadow.append(banner);
+  document.documentElement.append(host);
+  cancel.addEventListener("click", () => exitSelection());
 
-  let isSelectionMode = false;
-  let hoveredElement = null;
-  let activeTimers = {};
-  let currentSiteKey = '';
-  
-  // Create banner for selection mode
-  const banner = document.createElement('div');
-  banner.className = 'koala-clicker-banner';
-  banner.style.display = 'none';
-  banner.innerHTML = `
-    <span>KoalaClicker: Click an element to auto-click it.</span>
-    <button id="koala-cancel-btn">Cancel</button>
-  `;
-  document.documentElement.appendChild(banner);
-
-  // Note: MAIN-world compatibility script is injected natively by popup.js to resist CSP blocks.
-
-  banner.querySelector('#koala-cancel-btn').addEventListener('click', () => {
-    exitSelectionMode();
-  });
-
-  // Listen for messages from popup
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === 'PING') {
-      sendResponse({ status: 'OK' });
-      return true; // Keep message channel open for async safety
-    } else if (message.action === 'ENTER_SELECTION_MODE') {
-      currentSiteKey = message.url;
-      enterSelectionMode();
-    } else if (message.action === 'SYNC_CLICKERS') {
-      currentSiteKey = message.url;
-      syncClickers(message.clickers);
-    } else if (message.action === 'HIGHLIGHT_ELEMENT') {
-      document.querySelectorAll('.koala-clicker-highlight').forEach(el => 
-        el.classList.remove('koala-clicker-highlight')
+  function unhighlight() {
+    if (hovered) hovered.classList.remove("koala-clicker-highlight");
+    hovered = null;
+  }
+  function exitSelection(protectClickSequence = false) {
+    selection = null;
+    banner.style.display = "none";
+    unhighlight();
+    clearTimeout(releaseSelectionEvents);
+    suppressUntil = protectClickSequence ? performance.now() + 500 : 0;
+    const release = () => {
+      for (const type of [
+        "pointerdown",
+        "pointerup",
+        "mousedown",
+        "mouseup",
+        "click",
+        "dblclick",
+        "auxclick",
+        "contextmenu",
+      ])
+        window.removeEventListener(type, intercept, true);
+    };
+    if (protectClickSequence) releaseSelectionEvents = setTimeout(release, 500);
+    else release();
+    window.removeEventListener("mouseover", highlight, true);
+    window.removeEventListener("keydown", escape, true);
+  }
+  function stop() {
+    for (const timer of timers.values()) clearInterval(timer.handle);
+    timers.clear();
+    exitSelection();
+    enabled = false;
+    documentToken = crypto.randomUUID();
+  }
+  function validDocument() {
+    if (!api.runtime.id || route !== location.href) {
+      stop();
+      route = location.href;
+      return false;
+    }
+    return enabled;
+  }
+  function escape(event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      exitSelection();
+    }
+  }
+  function highlight(event) {
+    if (event.composedPath().includes(host)) return;
+    unhighlight();
+    hovered = event.target;
+    hovered?.classList?.add("koala-clicker-highlight");
+  }
+  function selectorFor(element) {
+    if (
+      !(element instanceof Element) ||
+      element.getRootNode() !== document ||
+      element.shadowRoot ||
+      /^(iframe|frame|canvas)$/i.test(element.localName)
+    )
+      throw new Error(
+        "Select a regular page element. Frames, Shadow DOM and canvas contents are not supported.",
       );
-      try {
-        const el = document.querySelector(message.selector);
-        if (el) el.classList.add('koala-clicker-highlight');
-      } catch (e) {
-        console.warn("KoalaClicker: Invalid selector prevented highlight execution.", e);
+    const unique = (selector) =>
+      document.querySelectorAll(selector).length === 1 &&
+      document.querySelector(selector) === element;
+    for (const attr of ["data-testid", "data-cy", "id"]) {
+      const value = element.getAttribute(attr);
+      if (!value) continue;
+      const candidate = `[${attr}="${CSS.escape(value)}"]`;
+      if (unique(candidate)) return candidate;
+    }
+    const path = [];
+    let current = element;
+    while (current instanceof Element) {
+      const siblings = [
+        ...(current.parentElement?.children || [current]),
+      ].filter((item) => item.localName === current.localName);
+      path.unshift(
+        `${CSS.escape(current.localName)}:nth-of-type(${siblings.indexOf(current) + 1})`,
+      );
+      const candidate = path.join(" > ");
+      if (candidate.length > KoalaClickerModel.MAX_SELECTOR_LENGTH) break;
+      if (unique(candidate)) return candidate;
+      current = current.parentElement;
+    }
+    throw new Error(
+      "A unique selector could not be created. Select another element.",
+    );
+  }
+  function notice(text) {
+    label.textContent = text;
+    cancel.textContent = "Close";
+    banner.style.display = "block";
+  }
+  async function intercept(event) {
+    if (event.composedPath().includes(host)) return;
+    if (!selection) {
+      if (event.isTrusted && performance.now() < suppressUntil) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
       }
-    } else if (message.action === 'UNHIGHLIGHT_ELEMENT') {
-      document.querySelectorAll('.koala-clicker-highlight').forEach(el => 
-        el.classList.remove('koala-clicker-highlight')
+      return;
+    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (event.type !== "click") return;
+    const selected = selection;
+    try {
+      if (!validDocument())
+        throw new Error("The page changed. Reopen KoalaClicker.");
+      const selector = selectorFor(event.composedPath()[0]);
+      exitSelection(true);
+      const result = await api.runtime.sendMessage({
+        action: "STORE",
+        op: selected.id ? "patch" : "add",
+        url: route,
+        token: documentToken,
+        id: selected.id,
+        selector,
+        patch: { selector, active: false },
+      });
+      if (!result?.ok)
+        throw new Error(result?.error || "Could not save the target.");
+      if (!validDocument()) return;
+      sync(result);
+      notice("Target saved, stopped. Open KoalaClicker to start it.");
+    } catch (error) {
+      exitSelection(true);
+      notice(error.message);
+    }
+  }
+  function targetFor(selector) {
+    try {
+      const matches = document.querySelectorAll(selector);
+      if (matches.length !== 1)
+        return {
+          reason: matches.length ? "Ambiguous target" : "Target missing",
+        };
+      const element = matches[0];
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      if (
+        !rect.width ||
+        !rect.height ||
+        style.visibility !== "visible" ||
+        element.closest('[inert], [hidden], [aria-disabled="true"]') ||
+        element.matches(":disabled")
+      )
+        return { reason: "Target unavailable" };
+      for (
+        let ancestor = element;
+        ancestor;
+        ancestor = ancestor.parentElement
+      ) {
+        if (Number(getComputedStyle(ancestor).opacity) === 0)
+          return { reason: "Target unavailable" };
+      }
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      const hit = document.elementFromPoint(x, y);
+      if (!hit || !(hit === element || element.contains(hit)))
+        return { reason: "Target covered or offscreen" };
+      return { element, x, y };
+    } catch {
+      return { reason: "Invalid selector" };
+    }
+  }
+  function tick(clicker) {
+    if (!validDocument() || selection) return;
+    const target = targetFor(clicker.selector);
+    status.set(clicker.id, target.reason || "Running");
+    if (!target.element) return;
+    const options = {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      clientX: target.x,
+      clientY: target.y,
+      button: 0,
+      detail: 1,
+    };
+    // Synthetic mouse events remain untrusted. Page handlers may reject them.
+    for (const type of ["mousedown", "mouseup", "click"]) {
+      if (!validDocument() || !target.element.isConnected) break;
+      target.element.dispatchEvent(
+        new MouseEvent(type, {
+          ...options,
+          buttons: type === "mousedown" ? 1 : 0,
+        }),
       );
     }
+  }
+  function sync(state) {
+    if (!enabled || state.revision < revision) return;
+    revision = state.revision;
+    clickers = KoalaClickerModel.normalizeClickers(state.clickers);
+    for (const [id, timer] of timers) {
+      const item = clickers.find(
+        (clicker) => clicker.id === id && clicker.active,
+      );
+      if (
+        !item ||
+        item.interval !== timer.interval ||
+        item.selector !== timer.selector
+      ) {
+        clearInterval(timer.handle);
+        timers.delete(id);
+        status.delete(id);
+      }
+    }
+    for (const clicker of clickers) {
+      if (clicker.active && !timers.has(clicker.id))
+        timers.set(clicker.id, {
+          ...clicker,
+          handle: setInterval(() => tick(clicker), clicker.interval),
+        });
+    }
+  }
+  api.storage.onChanged.addListener((changes, area) => {
+    const key = `site:${location.origin}`;
+    if (area !== "local" || !Object.hasOwn(changes, key)) return;
+    const state = changes[key].newValue;
+    if (validDocument())
+      sync(state || { revision: revision + 1, clickers: [] });
+  });
+  api.runtime.onMessage.addListener((message, sender, respond) => {
+    if (sender.id !== api.runtime.id) return false;
+    if (message?.action === "PING") {
+      if (route !== location.href) {
+        stop();
+        route = location.href;
+      }
+      respond({ ok: true, token: documentToken, url: location.href });
+      return false;
+    }
+    if (message?.token !== documentToken || message.url !== location.href) {
+      respond({ ok: false, error: "The page changed. Reopen KoalaClicker." });
+      return false;
+    }
+    if (message.action === "INIT") {
+      exitSelection();
+      enabled = true;
+      revision = -1;
+      api.runtime.sendMessage({ action: "STORE", op: "get", url: route }).then(
+        (result) => {
+          if (result?.ok && validDocument()) sync(result);
+          respond(result);
+        },
+        (error) => respond({ ok: false, error: error.message }),
+      );
+      return true;
+    }
+    if (!validDocument()) {
+      respond({ ok: false, error: "Reopen KoalaClicker to resume this page." });
+      return false;
+    }
+    if (message.action === "SELECT") {
+      exitSelection();
+      selection = { id: message.id };
+      label.textContent = "Select a target. It will be saved stopped.";
+      cancel.textContent = "Cancel (Esc)";
+      banner.style.display = "block";
+      for (const type of [
+        "pointerdown",
+        "pointerup",
+        "mousedown",
+        "mouseup",
+        "click",
+        "dblclick",
+        "auxclick",
+        "contextmenu",
+      ])
+        window.addEventListener(type, intercept, true);
+      window.addEventListener("mouseover", highlight, true);
+      window.addEventListener("keydown", escape, true);
+    } else if (message.action === "STATUS") {
+      respond({
+        ok: true,
+        states: Object.fromEntries(
+          clickers.map((item) => [
+            item.id,
+            item.active
+              ? targetFor(item.selector).reason || "Running"
+              : "Stopped",
+          ]),
+        ),
+      });
+      return false;
+    }
+    respond({ ok: true });
     return false;
   });
-
-  function enterSelectionMode() {
-    isSelectionMode = true;
-    banner.style.display = 'flex';
-    document.addEventListener('mouseover', onMouseOver, true);
-    document.addEventListener('mouseout', onMouseOut, true);
-    document.addEventListener('click', onClick, true);
-  }
-
-  function exitSelectionMode() {
-    isSelectionMode = false;
-    banner.style.display = 'none';
-    if (hoveredElement) {
-      hoveredElement.classList.remove('koala-clicker-highlight');
-      hoveredElement = null;
-    }
-    document.removeEventListener('mouseover', onMouseOver, true);
-    document.removeEventListener('mouseout', onMouseOut, true);
-    document.removeEventListener('click', onClick, true);
-  }
-
-  function onMouseOver(e) {
-    if (!isSelectionMode) return;
-    if (banner.contains(e.target)) return;
-    
-    hoveredElement = e.target;
-    hoveredElement.classList.add('koala-clicker-highlight');
-  }
-
-  function onMouseOut(e) {
-    if (!isSelectionMode) return;
-    if (hoveredElement) {
-      hoveredElement.classList.remove('koala-clicker-highlight');
-      hoveredElement = null;
-    }
-  }
-
-  function onClick(e) {
-    if (!isSelectionMode) return;
-    if (banner.contains(e.target)) return; // Don't intercept clicks on banner
-    
-    e.preventDefault();
-    e.stopPropagation();
-
-    const target = e.target;
-    const selector = generateSelector(target);
-    
-    exitSelectionMode();
-    saveNewClicker(selector);
-  }
-
-  function generateSelector(el) {
-    // Check for stable data attributes first
-    if (el.hasAttribute('data-testid')) {
-      return `[data-testid="${CSS.escape(el.getAttribute('data-testid'))}"]`;
-    }
-    if (el.hasAttribute('data-cy')) {
-      return `[data-cy="${CSS.escape(el.getAttribute('data-cy'))}"]`;
-    }
-    
-    // Checks if any segment of the class is an alphanumeric hash (e.g., "css-1ab2c3")
-    const isDynamicId = (str) => {
-      if (!str || str.length > 30) return true;
-      const parts = str.split(/[_-]/);
-      return parts.some(part => part.length >= 5 && /\d/.test(part) && /[a-zA-Z]/.test(part));
-    };
-    if (el.id && !isDynamicId(el.id)) {
-      return '#' + CSS.escape(el.id);
-    }
-
-    let path = [];
-    let current = el;
-    while (current && current.nodeType === Node.ELEMENT_NODE) {
-      let selector = current.nodeName.toLowerCase();
-      
-      if (current.id && !isDynamicId(current.id)) {
-        selector += '#' + CSS.escape(current.id);
-        path.unshift(selector);
-        break;
-      } else {
-        if (current.className && typeof current.className === 'string') {
-          const classes = current.className.split(/\s+/).filter(c => c && !isDynamicId(c));
-          if (classes.length > 0) {
-            selector += '.' + classes.map(c => CSS.escape(c)).join('.');
-          }
-        }
-        
-        let sibling = current;
-        let nth = 1;
-        while (sibling = sibling.previousElementSibling) {
-          if (sibling.nodeName.toLowerCase() == current.nodeName.toLowerCase()) {
-            nth++;
-          }
-        }
-        if (nth != 1) {
-          selector += ':nth-of-type(' + nth + ')';
-        }
-      }
-      path.unshift(selector);
-      current = current.parentNode;
-    }
-    return path.join(' > ');
-  }
-
-  function showToast(message) {
-    const toast = document.createElement('div');
-    toast.className = 'koala-clicker-toast';
-
-    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    icon.setAttribute('width', '16');
-    icon.setAttribute('height', '16');
-    icon.setAttribute('viewBox', '0 0 24 24');
-    icon.setAttribute('fill', 'none');
-    icon.setAttribute('stroke', '#bd93f9');
-    icon.setAttribute('stroke-width', '2.5');
-    icon.setAttribute('stroke-linecap', 'round');
-    icon.setAttribute('stroke-linejoin', 'round');
-    icon.style.flexShrink = '0';
-
-    const check = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-    check.setAttribute('points', '20 6 9 17 4 12');
-    icon.appendChild(check);
-
-    const text = document.createElement('span');
-    text.textContent = message;
-
-    toast.appendChild(icon);
-    toast.appendChild(text);
-    document.documentElement.appendChild(toast);
-    
-    // Trigger animation
-    setTimeout(() => toast.classList.add('show'), 10);
-    
-    // Remove toast after duration
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 300);
-    }, 2500);
-  }
-
-  function saveNewClicker(selector) {
-    chrome.storage.local.get([currentSiteKey], (result) => {
-      const clickers = result[currentSiteKey] || [];
-      if (clickers.length >= 50) {
-        alert("KoalaClicker: Maximum of 50 clickers per website reached.");
-        return;
-      }
-      const clickerName = "Clicker " + (clickers.length + 1);
-      
-      clickers.push({
-        selector: selector,
-        name: clickerName,
-        interval: 250, // Default interval
-        active: true,
-        id: Date.now().toString()
-      });
-      
-      const obj = {};
-      obj[currentSiteKey] = clickers;
-      chrome.storage.local.set(obj, () => {
-        syncClickers(clickers);
-        showToast(`${clickerName} successfully added!`);
-      });
-    });
-  }
-
-  function syncClickers(clickers) {
-    clickers = KoalaClickerModel.normalizeClickers(clickers);
-    const newActiveIds = clickers.filter(c => c.active).map(c => c.id);
-    const retainedSelectors = new Set(clickers.map(c => c.selector));
-    
-    // Stop deleted or deactivated clickers
-    for (const id in activeTimers) {
-      if (!newActiveIds.includes(id)) {
-        clearInterval(activeTimers[id].timer || activeTimers[id]);
-        delete activeTimers[id];
-      }
-    }
-
-    for (const selector of Object.keys(elementCache)) {
-      if (!retainedSelectors.has(selector)) delete elementCache[selector];
-    }
-
-    // Start or update active clickers safely
-    clickers.forEach(clicker => {
-      if (clicker.active) {
-        const safeInterval = clicker.interval;
-        const existing = activeTimers[clicker.id];
-        
-        // ONLY restart if the timer doesn't exist, or the timing value changed
-        if (!existing || existing.interval !== safeInterval) {
-          if (existing) clearInterval(existing.timer || existing);
-          
-          activeTimers[clicker.id] = {
-            interval: safeInterval,
-            timer: setInterval(() => triggerClick(clicker.selector), safeInterval)
-          };
-        }
-      }
-    });
-  }
-
-  const elementCache = {};
-
-  function triggerClick(selector) {
-    try {
-      let cached = elementCache[selector];
-      
-      // Refresh cache if element is missing or disconnected from DOM
-      if (!cached || !cached.el.isConnected) {
-        delete elementCache[selector]; // Prevent memory leak of detached nodes
-        const el = document.querySelector(selector);
-        if (!el) return; // Element not found, gracefully skip
-        
-        cached = { el };
-        elementCache[selector] = cached;
-      }
-
-      // Compute element coordinates dynamically on every tick to support moving elements
-      const rect = cached.el.getBoundingClientRect();
-      const clientX = rect.left + (rect.width / 2);
-      const clientY = rect.top + (rect.height / 2);
-
-      const eventOptions = {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-        clientX: clientX,
-        clientY: clientY
-      };
-
-      // Let the optional MAIN-world helper prepare compatible clicker games
-      // immediately before an actual user-configured click. DOM events cross
-      // the isolated-world boundary without exposing extension APIs.
-      document.dispatchEvent(new CustomEvent('koala-clicker:before-click'));
-
-      // Simulate a complete real click sequence
-      cached.el.dispatchEvent(new MouseEvent('mousedown', eventOptions));
-      cached.el.dispatchEvent(new MouseEvent('mouseup', eventOptions));
-      cached.el.dispatchEvent(new MouseEvent('click', eventOptions));
-    } catch(e) {
-      // Selector might be invalid if DOM changed drastically
-      console.error("KoalaClicker Error:", e);
-    }
-  }
+  window.addEventListener("pagehide", stop);
+  window.addEventListener("popstate", () => {
+    stop();
+    route = location.href;
+  });
+  window.addEventListener("hashchange", () => {
+    stop();
+    route = location.href;
+  });
 })();

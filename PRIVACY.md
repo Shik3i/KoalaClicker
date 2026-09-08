@@ -1,34 +1,37 @@
-# Privacy Policy for KoalaClicker
+# KoalaClicker privacy policy
 
-**Effective Date:** July 21, 2026
+Effective date: September 8, 2026. Extension version: 1.3.0.
 
-KoalaClicker ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains our practices regarding the collection, use, and disclosure of information when you use the KoalaClicker browser extension.
+KoalaClicker processes settings locally to repeat clicks on elements you select. Local processing is still data processing. The extension contains no analytics, advertising, telemetry, remote code, external fonts or network client. No runtime third-party libraries are shipped; development and validation use npm dependencies.
 
-## 1. Data Handling
-**We do not collect or transmit personal data to the developer or any third party.**
-KoalaClicker operates entirely inside your local browser. It does not use external servers, analytics tools, advertising systems, or tracking mechanisms.
+## Local information and control
 
-To provide its user-facing auto-clicking function, KoalaClicker locally handles the origin of the active page and the CSS selector, name, interval, and enabled state of clickers created by the user. This information remains in the browser's local extension storage and is never transmitted outside the local browser.
+The extension stores website origins (scheme, hostname and port), CSS selectors, names, intervals, enabled states, clicker IDs and a revision counter in `storage.local`. A selector or name can contain information from the page, so choose names accordingly. It reads the current page URL to authorize document actions; older origin-plus-path storage keys are migrated locally. No browsing-history permission is requested.
 
-## 2. Permissions
-KoalaClicker requires the following permissions to function:
-- `activeTab`: This permission is strictly used to interact with the current webpage **only when you explicitly click the extension icon**. It does not allow the extension to read your browsing history or track you across tabs.
-- `storage`: This is used locally on your device to save your configured clickers (CSS selectors and intervals) so you don't have to reconfigure them when you reopen the extension on the same site. This data never leaves your device.
-- `scripting`: This is used to inject the auto-clicking logic into the active tab you have chosen to interact with.
+Settings are shared across paths of the same origin, and updates reach tabs where you previously invoked KoalaClicker. Origins stay separate. Reloading or navigating stops that document; reopening the popup restores configured active targets. Closing a popup does not stop running clickers. Browser throttling, minimization and suspension can delay them.
 
-## 3. Third-Party Services
-KoalaClicker does not integrate with any third-party services, APIs, or fonts. It is built entirely with zero external dependencies to guarantee your privacy.
+Delete removes a target. Delete all removes configurations for the current website, including migrated legacy copies; an empty origin record and revision may remain. Stop all disables targets without deleting their settings. Uninstalling the extension removes its local extension storage. There is no remote backup. Storage migration writes the new copy before deleting legacy data; a failed write preserves the original.
 
-## 4. Chrome Web Store Limited Use
-KoalaClicker's use of information received from browser APIs is limited to providing and improving its single user-facing auto-clicking purpose. The extension does not transfer this information, use it for advertising, determine creditworthiness, or allow humans to read it.
+## Permissions and access
 
-The use of information received from Google APIs will adhere to the Chrome Web Store User Data Policy, including the Limited Use requirements.
+- `activeTab`: temporary page access after you invoke the extension using its toolbar action or configured shortcut. Browser-protected pages can deny access.
+- `scripting`: injects packaged selection and click code into the top-level document you invoked.
+- `storage`: saves and synchronizes local settings across extension contexts.
 
-## 5. Data Retention and Deletion
-Saved clicker configurations remain in local browser storage until the user deletes them or uninstalls the extension. KoalaClicker has no remote copy and cannot restore deleted local data.
+No standing host permissions or automatic content-script registration are requested. An event-driven background script serializes local storage changes; click timers run in invoked pages, including eligible background tabs. Page access is not automatically re-established after navigation by this extension.
 
-## 6. Changes to This Policy
-If we update this Privacy Policy, we will notify you by updating the "Effective Date" at the top of this document. Since we do not collect contact information, we encourage you to review this policy periodically.
+## Target pages and external links
 
-## 7. Contact Us
-If you have any questions about this Privacy Policy, please open an issue on our [GitHub Repository](https://github.com/Shik3i/KoalaClicker) or contact the maintainer directly.
+Synthetic clicks can trigger actions, submissions and network requests made by the target website under that website's rules. This is distinct from uploading or tracking by KoalaClicker. Links to GitHub, legal information, support or future store listings open external services only when you choose them. Their own privacy policies apply.
+
+## Website and support
+
+The informational website is separate from the extension. It stores the chosen language under `koalaclicker-lang` in website localStorage; clearing that website's site data removes it. It uses local assets and no analytics. Hosting may process connection information. The actual hosting provider, location, logged fields and complete deletion schedule must be confirmed by the operator before deployment; this repository does not establish those facts.
+
+Support messages you submit to GitHub are processed by GitHub and may be public. Do not include private page content. Operator/contact information: https://koalastuff.net/legal.
+
+## Chrome Web Store Limited Use
+
+Browser API information is used solely for the visible clicker features described here. It is not sold, used for advertising or transferred by the extension. KoalaClicker's use of information received from Google APIs adheres to the Chrome Web Store User Data Policy, including its Limited Use requirements.
+
+Firefox's `data_collection_permissions.required: ["none"]` describes the absence of extension data collection/transmission outside the browser under Mozilla's taxonomy; it does not mean local settings are unprocessed.

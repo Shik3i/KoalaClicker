@@ -8,7 +8,7 @@
   function parseSiteUrl(value) {
     try {
       const url = new URL(value);
-      return url.protocol === 'http:' || url.protocol === 'https:' ? url : null;
+      return url.protocol === "http:" || url.protocol === "https:" ? url : null;
     } catch {
       return null;
     }
@@ -26,28 +26,55 @@
   function normalizeClickers(value) {
     if (!Array.isArray(value)) return [];
 
+    const ids = new Set();
     return value.slice(0, MAX_CLICKERS).flatMap((clicker, index) => {
-      if (!clicker || typeof clicker !== 'object') return [];
-      if (typeof clicker.selector !== 'string' || !clicker.selector || clicker.selector.length > MAX_SELECTOR_LENGTH) return [];
+      if (!clicker || typeof clicker !== "object") return [];
+      if (
+        typeof clicker.selector !== "string" ||
+        !clicker.selector ||
+        clicker.selector.length > MAX_SELECTOR_LENGTH
+      )
+        return [];
 
-      const parsedInterval = parseInt(clicker.interval, 10);
-      const interval = Math.min(MAX_INTERVAL, Math.max(MIN_INTERVAL, Number.isFinite(parsedInterval) ? parsedInterval : 250));
-      const id = typeof clicker.id === 'string' && clicker.id
-        ? clicker.id.slice(0, 128)
-        : fallbackId(clicker.selector, index);
-      const name = typeof clicker.name === 'string' && clicker.name.trim()
-        ? clicker.name.trim().slice(0, MAX_NAME_LENGTH)
-        : `Clicker ${index + 1}`;
+      const parsedInterval = Number(clicker.interval);
+      const interval = Math.min(
+        MAX_INTERVAL,
+        Math.max(
+          MIN_INTERVAL,
+          Number.isFinite(parsedInterval) ? parsedInterval : 250,
+        ),
+      );
+      let id =
+        typeof clicker.id === "string" && clicker.id
+          ? clicker.id.slice(0, 128)
+          : fallbackId(clicker.selector, index);
+      if (ids.has(id)) id = fallbackId(clicker.selector, index);
+      while (ids.has(id)) id += "-";
+      ids.add(id);
+      const name =
+        typeof clicker.name === "string" && clicker.name.trim()
+          ? clicker.name.trim().slice(0, MAX_NAME_LENGTH)
+          : `Clicker ${index + 1}`;
 
-      return [{ selector: clicker.selector, name, interval, active: clicker.active === true, id }];
+      return [
+        {
+          selector: clicker.selector,
+          name,
+          interval: Math.round(interval),
+          active: clicker.active === true,
+          id,
+        },
+      ];
     });
   }
 
   globalThis.KoalaClickerModel = Object.freeze({
     MAX_INTERVAL,
+    MAX_CLICKERS,
+    MAX_SELECTOR_LENGTH,
     MAX_NAME_LENGTH,
     MIN_INTERVAL,
     normalizeClickers,
-    parseSiteUrl
+    parseSiteUrl,
   });
 })();

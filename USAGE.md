@@ -1,71 +1,24 @@
-# KoalaClicker User Guide & FAQ
+# Using KoalaClicker 1.3.0
 
-Welcome to **KoalaClicker**! This guide is designed to help you get the most out of your modern, lightweight, privacy-focused auto-clicker. 
+1. Install the browser-specific package as described in README.md. Open an ordinary HTTP/HTTPS page.
+2. Invoke the toolbar icon or configured shortcut (`Alt+Shift+K`; macOS: `MacCtrl+Shift+K`). Browser shortcut settings may override it.
+3. Choose Add New Clicker. Select a regular visible element in the main document. Escape or Cancel exits selection. The target is saved stopped. The next 500 ms of page mouse input are consumed to prevent an accidental second click; reopening the popup ends this guard.
+4. Reopen the popup. Choose a name and an interval of 25–86,400,000 whole milliseconds. Press Start. Stop or Stop all ends clicks; closing the popup does not.
+5. Select target again replaces a target and stops it. Delete removes it; Delete all clears this website after confirmation.
 
----
+## Status and recovery
 
-## 🚀 Quick Start Guide
+- Running: configured active and currently usable; the website may still reject synthetic clicks.
+- Stopped: no timer for this target.
+- Target missing / Ambiguous target / Invalid selector: page structure changed. Select the target again.
+- Target unavailable / Target covered or offscreen: reveal, enable, uncover or scroll the target into view.
+- Saving…: operation dispatched; Saved confirms the write. A storage error means completion was not confirmed. Reopen to inspect saved state and retry. Invalid intervals keep the previous value.
+- Page changed / blocked access: reopen on a supported page. Reload, SPA routes, history restoration and navigation stop that document. No automatic injection on new pages.
 
-Getting KoalaClicker up and running takes less than 10 seconds!
+Settings apply to the entire origin (scheme, hostname, port), across its paths and tabs where the extension was invoked. Other origins are separate. Previously configured active targets resume when you reopen the popup. Stop all affects already invoked tabs of this origin. A new tab receives no script until invocation.
 
-### Step 1: Open the Extension
-Navigate to the webpage where you want to automate clicks, and click the **KoalaClicker icon** in your browser's toolbar. 
+Frame contents, Shadow DOM, canvas contents and trusted hardware input are unsupported. SVG elements can receive synthetic mouse events; websites decide whether to react. A structural selector can refer to a different element after page reordering; verify the page and reselect when needed. Earlier page window-capture handlers may see selection input.
 
-### Step 2: Add a Clicker
-*   Click the purple **"Add New Clicker"** button in the popup.
-*   The popup will automatically close, and you will enter **Element Selection Mode** (indicated by a floating banner at the top of your screen).
-*   Simply hover over any clickable element on the page (like a button, image, or link) and **click it**. 
+Background tabs, minimized windows and sleeping devices throttle or suspend timers. No exact rate or catch-up is promised. Disable/uninstall invalidates extension access; documents stop on their next execution opportunity. Closing the target tab ends its timers.
 
-### Step 3: Configure and Click!
-*   The element will immediately start being clicked.
-*   Reopen the popup at any time to:
-    *   **Toggle active status**: Start or stop individual clickers instantly.
-    *   **Adjust interval**: Type a custom click speed in milliseconds (`ms`). The minimum interval is a blazing-fast **25ms** (40 clicks per second!).
-    *   **Rename**: Give your clickers descriptive names (e.g. *"Main Cookie"*, *"Buy Upgrade"*).
-    *   **Delete**: Remove clickers you no longer need.
-
----
-
-## 🔒 Understanding the "Privacy-First" Model
-
-Most browser clickers ask for permissions to read all your data on all websites at all times. KoalaClicker does not.
-
-To protect your credentials and browsing history, we use the `activeTab` permission. This means:
-1.  **Strict Isolation**: KoalaClicker has **no access** to any tab until you explicitly click the extension icon on that page.
-2.  **Page Reloads**: If you reload a page, the browser automatically revokes our access for safety. **Don't worry!** If you want to resume clicking, simply click the extension toolbar icon again. The extension will automatically detect your previously configured clickers for that site and load them instantly!
-
----
-
-## 💡 Advanced Tips
-
-### 🏎️ Maximize Clicking Speed
-Some clicker games track timing state in the page context and may ignore very rapid synthetic clicks.
-*   On the official Cookie Clicker host (`orteil.dashnet.org`), KoalaClicker injects a small **game compatibility helper** (`compatibility.js`) that adjusts Cookie Clicker's local click timing immediately before configured clicks. It remains inactive on all other hosts.
-*   For supported games such as *Cookie Clicker*, it keeps local timing state responsive so your clicks can register at low intervals like **25ms**.
-*   To keep your browser responsive, we recommend keeping intervals above **50ms** if you have more than 10 clickers active simultaneously.
-
-### 🎯 Targeting Elements Without IDs
-Many modern websites use dynamic, randomized CSS class names and IDs (e.g., `button-abc123xyz` or `css-92hf84`). 
-*   KoalaClicker automatically avoids these dynamic IDs using smart pattern matching.
-*   If an element does not have a stable ID, it climbs up the DOM tree and creates a robust structural path (e.g. `body > div > main > button:nth-of-type(3)`).
-*   If a button is not registering, try selecting its parent container or target the text directly!
-
----
-
-## ❓ Frequently Asked Questions (FAQ)
-
-#### Q: Why does the popup close when I click "Add New Clicker"?
-**A:** This is a design feature! In order to let you hover and select elements directly on the active webpage, the popup must close so the browser returns focus to the web page.
-
-#### Q: Why did the clicking stop after I reloaded the page?
-**A:** For your security, the browser strips all active permissions from extensions upon page reload. Simply click the extension icon in the toolbar, and KoalaClicker will immediately resume all your active clickers exactly where you left off.
-
-#### Q: Does KoalaClicker send my data anywhere?
-**A:** **No.** KoalaClicker operates 100% locally on your computer. It does not use any cloud servers, analytics tools, or tracking pixels. Your configurations are saved securely inside your browser's local sandbox (`chrome.storage.local`).
-
-#### Q: What is the maximum number of clickers I can add?
-**A:** You can add up to **50 parallel clickers** per website. This allows you to completely automate complex games or multi-step form tasks easily.
-
----
-
-*Enjoying KoalaClicker? Check out our [GitHub Repository](https://github.com/Shik3i/KoalaClicker) to star the project, report bugs, or contribute code!*
+For full local data removal, uninstall the extension. Delete all removes this origin's configurations and legacy copies; an empty origin record may remain. Website language preference is separate: clear that website's site data.
