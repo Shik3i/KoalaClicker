@@ -1,6 +1,6 @@
 # Store listing — English (primary)
 
-Version: 1.3.0. Submission folder: `assets/store/`.
+Version: 1.3.1. Submission folder: `assets/store/`.
 
 ## Name
 

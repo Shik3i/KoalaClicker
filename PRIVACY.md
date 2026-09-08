@@ -1,6 +1,6 @@
 # KoalaClicker privacy policy
 
-Effective date: September 8, 2026. Extension version: 1.3.0.
+Effective date: September 9, 2026. Extension version: 1.3.1.
 
 KoalaClicker processes settings locally to repeat clicks on elements you select. Local processing is still data processing. The extension contains no analytics, advertising, telemetry, remote code, external fonts or network client. No runtime third-party libraries are shipped; development and validation use npm dependencies.
 

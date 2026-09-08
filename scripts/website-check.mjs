@@ -74,7 +74,7 @@ try {
     await page.waitForFunction(
       () =>
         document.querySelector("[data-koalaclicker-version]")?.textContent ===
-        "v1.3.0",
+        "v1.3.1",
     );
     assert.equal(
       await page.evaluate(
@@ -165,7 +165,7 @@ try {
   await page.waitForFunction(
     () =>
       document.querySelector("[data-koalaclicker-version]").textContent ===
-      "v1.3.0",
+      "v1.3.1",
   );
   assert.deepEqual(errors, []);
   console.log(

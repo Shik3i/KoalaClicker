@@ -1,6 +1,6 @@
 # Store-Beschreibung — Deutsch (Lokalisierung)
 
-Version: 1.3.0. Englische Hauptfassung und technische Einreichungsangaben: `listing.md`.
+Version: 1.3.1. Englische Hauptfassung und technische Einreichungsangaben: `listing.md`.
 
 Name: KoalaClicker
 

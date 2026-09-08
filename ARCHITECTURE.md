@@ -1,6 +1,6 @@
 # Architecture
 
-KoalaClicker 1.3.0 ships vanilla HTML/CSS/JavaScript with no runtime libraries. npm dependencies support build, tests and Firefox validation only.
+KoalaClicker 1.3.1 ships vanilla HTML/CSS/JavaScript with no runtime libraries. npm dependencies support build, tests and Firefox validation only.
 
 - `src/popup/`: action popup, immediate field operations, persisted-state feedback, status polling and document-bound page actions.
 - `src/background.js`: sole storage writer. A promise queue serializes read/modify/write operations across popups and content documents. Operations patch individual IDs/fields; stale edits cannot reinsert deleted records. Failures do not poison later requests. Chrome uses an MV3 service worker; Firefox uses an event background page.
