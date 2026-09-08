@@ -35,8 +35,18 @@ if (typeof importScripts === "function") importScripts("shared/model.js");
     const oldKeys = Object.keys(stored)
       .filter((old) => model.parseSiteUrl(old)?.origin === url.origin)
       .sort();
+    const importKeys = existing?.legacyMigrated ? [] : oldKeys;
+    if (
+      message.op !== "clear" &&
+      [existing?.clickers, ...importKeys.map((old) => stored[old])].some(
+        (items) => Array.isArray(items) && items.length > model.MAX_CLICKERS,
+      )
+    )
+      throw new Error(
+        "Stored data contains more than 50 targets. Delete all for this website to reset it; existing data has been preserved.",
+      );
     let clickers = model.normalizeClickers(existing?.clickers);
-    for (const old of oldKeys) {
+    for (const old of importKeys) {
       const imported = model.normalizeClickers(stored[old]);
       for (const item of imported) {
         if (
@@ -116,6 +126,10 @@ if (typeof importScripts === "function") importScripts("shared/model.js");
         (Number.isSafeInteger(existing?.revision) ? existing.revision : 0) +
         (changed ? 1 : 0),
       clickers,
+      legacyMigrated:
+        existing?.legacyMigrated === true ||
+        oldKeys.length > 0 ||
+        op === "clear",
     };
     if (changed) await api.storage.local.set({ [key]: state });
     // Never delete the old copy before the new record is durably stored.

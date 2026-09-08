@@ -141,6 +141,41 @@ test("migration retries failed cleanup without discarding the committed copy", a
   assert.equal((await h.send("get")).clickers.length, 1);
   assert.equal(h.data["https://example.com/path"], undefined);
 });
+
+test("oversized legacy and current records are preserved until explicit clear", async () => {
+  const clickers = Array.from({ length: 51 }, (_, index) => ({
+    id: String(index),
+    selector: `#target-${index}`,
+  }));
+  for (const initial of [
+    { "https://example.com/path": clickers },
+    { "site:https://example.com": { revision: 1, clickers } },
+  ]) {
+    const h = harness(initial);
+    assert.equal((await h.send("get")).ok, false);
+    assert.deepEqual(h.data, initial);
+    assert.equal((await h.send("clear")).ok, true);
+    assert.equal((await h.send("get")).clickers.length, 0);
+  }
+});
+
+test("failed legacy cleanup cannot duplicate IDs or resurrect a deleted target", async () => {
+  const h = harness({
+    "https://example.com/one": [{ id: "same", selector: "#one" }],
+    "https://example.com/two": [{ id: "same", selector: "#two" }],
+  });
+  h.failRemove(true);
+  assert.equal((await h.send("get")).ok, false);
+  const id = h.data["site:https://example.com"].clickers[0].id;
+  assert.equal((await h.send("delete", { id })).ok, false);
+  assert.equal(h.data["site:https://example.com"].clickers.length, 1);
+  h.failRemove(false);
+  const result = await h.send("get");
+  assert.equal(result.ok, true);
+  assert.equal(result.clickers.length, 1);
+  assert.equal(result.clickers[0].selector, "#two");
+  assert.equal(h.data["https://example.com/two"], undefined);
+});
 test("corrupt records, duplicate IDs and limits normalize deterministically", async () => {
   const h = harness({
     "https://example.com": [
