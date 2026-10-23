@@ -3,6 +3,7 @@ import path from "node:path";
 import { createServer } from "node:http";
 import assert from "node:assert/strict";
 import puppeteer from "puppeteer-core";
+const expectedVersion = `v${JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8")).version}`;
 const root = path.resolve("dist/website"),
   output = path.resolve("build/website");
 fs.mkdirSync(output, { recursive: true });
@@ -72,9 +73,7 @@ try {
     await page.setViewport(viewport);
     await page.goto(base);
     await page.waitForFunction(
-      () =>
-        document.querySelector("[data-koalaclicker-version]")?.textContent ===
-        "v1.3.1",
+      (ver) => document.querySelector("[data-koalaclicker-version]")?.textContent === ver, {}, expectedVersion,
     );
     assert.equal(
       await page.evaluate(
@@ -163,9 +162,7 @@ try {
   await page.goto(base);
   await page.click(".lang-toggle");
   await page.waitForFunction(
-    () =>
-      document.querySelector("[data-koalaclicker-version]").textContent ===
-      "v1.3.1",
+    (ver) => document.querySelector("[data-koalaclicker-version]")?.textContent === ver, {}, expectedVersion,
   );
   assert.deepEqual(errors, []);
   console.log(
