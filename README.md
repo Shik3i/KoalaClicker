@@ -1,6 +1,6 @@
 # KoalaClicker
 
-Current build: v1.3.1
+Current build: v1.3.2
 
 Repeat synthetic mouse clicks on selected elements in a web page. Configure up to 50 targets per website, with independent names and intervals from 25 to 86,400,000 milliseconds.
 
